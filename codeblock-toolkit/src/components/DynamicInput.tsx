@@ -1,28 +1,28 @@
 import React from 'react';
-import Editicon from './icons/Edit.icon';
+import Editicon from '../icons/Edit.icon';
 
 
 interface EditableFieldProps {
-  value: string | string[];
+  stateValues: [{ [key: string]: any }, React.Dispatch<React.SetStateAction<any>>];
   field: 'subnetName' | 'range' | 'networkName' | 'region';
-  isEditing: boolean;
-  onEdit: (field:  'subnetName' | 'range' | 'networkName' | 'region') => void;
-  onChange: (field:  'subnetName' | 'range' | 'networkName' | 'region', newValue: string) => void;
-  onBlur: () => void;
-  onCancel: () => void;
 }
 
 const DynamicInput: React.FC<EditableFieldProps> = ({
-  value,
+  stateValues,
   field,
-  isEditing,
-  onEdit,
-  onChange,
-  onBlur,
-  onCancel,
 }) => {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [values, setValues] = stateValues;
+  const handleBlur  = () => {
+    setIsEditing(false);
+  
+  }
+
+  const handleFieldChange = (field: keyof typeof values, newValue: string) => {
+    setValues((e:any)=>({...e, [field]: newValue}));
+  };
     
-  return isEditing ? (
+  return (isEditing) ? (
     <div
       style={{
         position: 'relative',
@@ -35,20 +35,20 @@ const DynamicInput: React.FC<EditableFieldProps> = ({
 
       <input
         type="text"
-        value={value}
-        onChange={(e) => onChange(field, e.target.value)}
-        onBlur={onBlur}
+        value={values[field]}
+        onChange={(e) => handleFieldChange(field, e.target.value)}
+        onBlur={handleBlur}
         autoFocus
         style={{
           outline: 'none',
           border: 'none',
           fontSize: 'inherit',
           lineHeight: 'inherit',
-          width: `${value.length}ch`,
+          width: `${values[field].length}ch`,
         }}
       />
       <button
-        onClick={onCancel}
+        onClick={handleBlur}
         style={{
           background: 'transparent',
           border: 'none',
@@ -64,10 +64,12 @@ const DynamicInput: React.FC<EditableFieldProps> = ({
     </div>
   ) : (
     <span
-      className={`flex w-[${value.length}ch]`}
-      onClick={() => onEdit(field)}
+      className={`flex w-[${values[field].length}ch]`}
+      onClick={() => {
+        console.log('click')
+        setIsEditing(true);}}
       style={{ cursor: 'pointer', color: '#d01884' }}>
-      {value} <span className="edit-icon ml-2 flex"><Editicon /></span>
+      {values[field]} <span className="edit-icon ml-2 flex"><Editicon /></span>
     </span>
   );
 };
