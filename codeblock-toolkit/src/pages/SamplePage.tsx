@@ -11,8 +11,9 @@ interface ChildComponentProps {
 const SamplePage: React.FC<ChildComponentProps> = () => {
   const [values, setValues] = useState({
     subnetName:"SUBNET_NAME",
-    range: "_NEXT_PUBLIC_PARENTYN_API_BASE_URL",
+    publicBaseUrl: "_NEXT_PUBLIC_PARENTYN_API_BASE_URL",
     networkName: 'NETWORK_NAME',
+    applicationName: 'APPLICATION_NAME',
     region: 'REGION',
   });
 
@@ -105,17 +106,32 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
             <span>
             <Txt tab={2}>
               <Txt tab={.5} endSpace={0}>echo "NEXT_PUBLIC_PARENTYN_API_BASE_URL=$</Txt>
-              <DynamicInput field="range" stateValues={[values, setValues]}/>
+              <DynamicInput field="publicBaseUrl" stateValues={[values, setValues]}/>
               <Txt title='>>' endSpace={0}></Txt>
             
               <Txt>/storage/.env</Txt>
-              <DynamicInput field="range" stateValues={[values, setValues]}/>
+              <DynamicInput field="publicBaseUrl" stateValues={[values, setValues]}/>
             </Txt>
             </span>
             <Txt tab={1.5}>volumes: 'ubuntu'</Txt> 
             <Txt tab={1.5}>- name: 'myvolume'</Txt>
             <Txt tab={2}>path: '/storage'</Txt>
-         
+
+            <Txt tab={1}>- id: build-image</Txt>
+            <Txt tab={1.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+            <Txt tab={1.5}>entrypoint: 'bash'</Txt>
+            <Txt tab={1.5}>args:</Txt>
+            <Txt tab={2}>[</Txt>
+            <Txt tab={2.5}>"-c",</Txt>
+            <Txt tab={2.5}>
+              "cp /storage/.env ./
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              /.env && docker build -t eu.gcr.io/codematic-shared-environment/parentyn-admin-frontend-web:$SHORT_SHA ./
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              ",
+            </Txt>
+            <Txt tab={2}>]</Txt>
+
             </p>
 
           </div>
