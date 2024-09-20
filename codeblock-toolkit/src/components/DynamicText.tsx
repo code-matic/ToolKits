@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import React from 'react'
 
 interface dynamicTextProp {
@@ -13,7 +14,7 @@ export default function DText({ children, tab = 0, title="", endSpace=1}: dynami
 
   return (
     <>
-      <span className={`${false ? "block w-full" : "flex flex-wrap"}`}>
+      <p className={`${false ? "block w-full" : "flex flex-wrap"}`}>
         <>
           {tabSpaces}{title}
         </>
@@ -22,7 +23,7 @@ export default function DText({ children, tab = 0, title="", endSpace=1}: dynami
         </>
         {spaces}
         <br />
-      </span>
+      </p>
     </>
   )
 }

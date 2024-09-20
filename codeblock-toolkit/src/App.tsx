@@ -8,8 +8,6 @@ function App() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
-
-
   const handleDropdown = (index: number) => {
     const activeIndex = tabIndex === index ? -1 : index
     setTabIndex(activeIndex)
@@ -50,6 +48,7 @@ const tabs = [{
     <div>
       </div>
     </div>
+
 
    </section>
   )

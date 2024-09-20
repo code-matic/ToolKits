@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import Txt from '../components/DynamicText';
 import DynamicInput from '../components/DynamicInput';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ChildComponentProps {
-  // onValsuesUpdate: (updatedValues: { subnetName: string ; range: string | string[]; networkName: string; region: string }) => void;
+  onValsuesUpdate?: (updatedValues: { subnetName: string ; range: string | string[]; networkName: string; region: string }) => void;
 }
 
 const SamplePage: React.FC<ChildComponentProps> = () => {
@@ -15,8 +17,6 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
   });
 
 
-
-
   const containerRef = useRef<HTMLDivElement>(null);
 
 
@@ -26,21 +26,23 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = containerRef.current.innerHTML;
 
+      // Remove unwanted elements (e.g., icons)
       const icons = tempDiv.querySelectorAll('.edit-icon');
       icons.forEach((icon) => icon.remove());
 
-      const range = document.createRange();
-      range.selectNodeContents(tempDiv);
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
+      // Get text content line by line from div and p tags
+      const textToCopy = Array.from(tempDiv.childNodes)
+        .map((node: ChildNode) => (node as HTMLElement).innerText)
+        .join('\n'); // Join text with new lines
 
-      navigator.clipboard.writeText(tempDiv.innerText);
-      alert('Copied to clipboard!');
+      // Copy the text to clipboard
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        toast.success("Copied to clipboard");
+      });
     }
   };
+
+  
 
   return (
     <div
@@ -100,16 +102,16 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
             <Txt tab={1.5}>args:</Txt>
             <Txt tab={2}>- '-c'</Txt>
             <Txt tab={2}>- | </Txt>
+            <span>
             <Txt tab={2}>
-              <Txt>
-                <Txt tab={.5} endSpace={0}>echo "NEXT_PUBLIC_PARENTYN_API_BASE_URL=$</Txt>
-              </Txt>
+              <Txt tab={.5} endSpace={0}>echo "NEXT_PUBLIC_PARENTYN_API_BASE_URL=$</Txt>
               <DynamicInput field="range" stateValues={[values, setValues]}/>
               <Txt title='>>' endSpace={0}></Txt>
+            
               <Txt>/storage/.env</Txt>
               <DynamicInput field="range" stateValues={[values, setValues]}/>
-
             </Txt>
+            </span>
             <Txt tab={1.5}>volumes: 'ubuntu'</Txt> 
             <Txt tab={1.5}>- name: 'myvolume'</Txt>
             <Txt tab={2}>path: '/storage'</Txt>
@@ -118,8 +120,25 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
 
           </div>
         </div>
+
+        <ToastContainer
+          position="bottom-left"
+          autoClose={2500}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable={false}
+          pauseOnHover={false}
+          theme="dark"
+          />
       </div>
   );
 };
 
 export default SamplePage;
+
+
+
+

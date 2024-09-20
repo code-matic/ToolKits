@@ -3,6 +3,7 @@ import Editicon from '../icons/Edit.icon';
 
 
 interface EditableFieldProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stateValues: [{ [key: string]: any }, React.Dispatch<React.SetStateAction<any>>];
   field: 'subnetName' | 'range' | 'networkName' | 'region';
 }
@@ -19,6 +20,7 @@ const DynamicInput: React.FC<EditableFieldProps> = ({
   }
 
   const handleFieldChange = (field: keyof typeof values, newValue: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setValues((e:any)=>({...e, [field]: newValue}));
   };
     
