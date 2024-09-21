@@ -15,6 +15,8 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
     networkName: 'NETWORK_NAME',
     applicationName: 'APPLICATION_NAME',
     region: 'REGION',
+    environment: 'ENVIRONMENT',
+    appProjectName: 'APP_PROJECT_NAME',
   });
 
 
@@ -130,6 +132,46 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
               ",
             </Txt>
+            <Txt tab={2}>]</Txt>
+
+            <Txt tab={1}>- id: push-image</Txt>
+            <Txt tab={1.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+            <Txt tab={1.5}>args:</Txt>
+            <Txt tab={2}>[</Txt>
+            <Txt tab={2.5}>'push',</Txt>
+            <Txt tab={2.5}>
+              'eu.gcr.io/codematic-shared-environment/
+              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>
+              :$SHORT_SHA',
+            </Txt>
+            <Txt tab={2}>]</Txt>
+
+            <Txt tab={1}>- id: deploy-image</Txt>
+            <Txt tab={1.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+            <Txt tab={1.5}>entrypoint: gcloud</Txt>
+            <Txt tab={1.5}>args:</Txt>
+            <Txt tab={2}>[</Txt>
+            <Txt tab={2.5}>'run', 'deploy',</Txt>
+            <Txt tab={2.5}>
+              '<DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>', 
+              '--image', 'eu.gcr.io/codematic-shared-environment/
+              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>
+              :$SHORT_SHA;',
+            </Txt>
+            <Txt tab={2.5}>
+              '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'</Txt>
             <Txt tab={2}>]</Txt>
 
             </p>
