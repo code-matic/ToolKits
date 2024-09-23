@@ -23,6 +23,40 @@ const tabs = [{
 }]
   return (
    <section>
+
+<div className="border border-gray-500 w-[1200px] mx-auto mt-5 h-[100%] rounded-lg">
+        <div className="p-5">
+          <h2 className="text-lg font-bold mb-3">Keywords and Sample Values</h2>
+          <table className="table-auto w-full border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 text-left border-b">Key</th>
+                <th className="px-4 py-2 text-left border-b">Sample Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-4 py-2 border-b">APPLICATION_NAME</td>
+                <td className="px-4 py-2 border-b">parentyn</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border-b">APP_PROJECT_NAME</td>
+                <td className="px-4 py-2 border-b">codematic-shared-environment</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border-b">ENVIRONMENT</td>
+                <td className="px-4 py-2 border-b">sandbox</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border-b">REGION</td>
+                <td className="px-4 py-2 border-b">us-west2</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      
     <div  className="border border-gray-500 w-[1200px] mx-auto mt-5 h-[100%] rounded-lg">
       <div className="flex border-b border-gray-500">
         {
