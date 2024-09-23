@@ -66,12 +66,12 @@ const DynamicInput: React.FC<EditableFieldProps> = ({
     </div>
   ) : (
     <span
-      className={`flex w-[${values[field].length}ch]`}
-      onClick={() => {
-        console.log('click')
-        setIsEditing(true);}}
-      style={{ cursor: 'pointer', color: '#d01884' }}>
-      {values[field]} <span className="edit-icon ml-2 flex"><Editicon /></span>
+      onClick={() => setIsEditing(true)}
+      style={{ cursor: 'pointer', color: '#d01884', display: 'inline-block' }}>
+      {values[field]}
+      <span className="edit-icon ml-2" style={{ display: 'inline-block' }}>
+        <Editicon />
+      </span>
     </span>
   );
 };
