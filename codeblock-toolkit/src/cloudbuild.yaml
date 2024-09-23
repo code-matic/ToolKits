@@ -4,7 +4,7 @@ steps:
     entrypoint: 'bash'
     args:
       - '-c'
-      - "docker build -f /codeblock-toolkit/src/Dockerfile -t eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA ./."
+      - "docker build -f codeblock-toolkit/src/Dockerfile -t eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA ./."
 
   - id: push-image
     name: "gcr.io/cloud-builders/docker"
