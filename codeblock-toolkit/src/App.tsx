@@ -1,4 +1,5 @@
 import SamplePage from "./pages/SamplePage";
+import backendPage from "./pages/backendPage";
 import { useState } from "react";
 // import CopyWithIndentationFromDiv from "./copySample";
 
@@ -14,11 +15,11 @@ function App() {
 }
 
 const tabs = [{
-    name: "VPC Configuration",
+    name: "Frontend Configuration",
     component: SamplePage
 }, {
-  name: "Subnet",
-  component: null
+  name: "Backend Configuration",
+  component: backendPage
 }]
   return (
    <section>
