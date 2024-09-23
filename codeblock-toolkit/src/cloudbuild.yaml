@@ -4,7 +4,7 @@ steps:
     args: [
       'build',
       '-t', 'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA',
-      './codeblock-toolkit/src'  # Ensure this path is correct
+      'codeblock-toolkit/src' 
     ]
   
   - id: push-image
