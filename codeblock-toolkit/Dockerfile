@@ -3,7 +3,7 @@ FROM node:18-alpine
 # The /src directory should act as the main application directory
 WORKDIR /src
 
-# Copy all files
+COPY codeblock-toolkit/src/package.json .
 COPY . ./src
 
 # RUN npm install
