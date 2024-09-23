@@ -1,7 +1,7 @@
 FROM node:18-alpine
 
 # The /src directory should act as the main application directory
-WORKDIR /src
+WORKDIR /codeblock-toolkit
 
 # Copy all files
 COPY . .
