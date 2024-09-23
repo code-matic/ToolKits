@@ -37,10 +37,14 @@ const tabs = [{
             <tbody>
               <tr>
                 <td className="px-4 py-2 border-b">APPLICATION_NAME</td>
-                <td className="px-4 py-2 border-b">parentyn</td>
+                <td className="px-4 py-2 border-b">frontend</td>
               </tr>
               <tr>
                 <td className="px-4 py-2 border-b">APP_PROJECT_NAME</td>
+                <td className="px-4 py-2 border-b">parentyn</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border-b">PROJECT_ID</td>
                 <td className="px-4 py-2 border-b">codematic-shared-environment</td>
               </tr>
               <tr>
@@ -49,14 +53,14 @@ const tabs = [{
               </tr>
               <tr>
                 <td className="px-4 py-2 border-b">REGION</td>
-                <td className="px-4 py-2 border-b">us-west2</td>
+                <td className="px-4 py-2 border-b">europe-west1</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      
+
     <div  className="border border-gray-500 w-[1200px] mx-auto mt-5 h-[100%] rounded-lg">
       <div className="flex border-b border-gray-500">
         {

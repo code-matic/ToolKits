@@ -1,49 +1,26 @@
 steps: 
-  - id: create-env
-    name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        echo "NEXT_PUBLIC_PARENTYN_API_BASE_URL=$_NEXT_PUBLIC_PARENTYN_API_BASE_URL" >> /storage/.env
-    volumes:
-    - name: 'myvolume'
-      path: '/storage'
-  - id: build-image
-    name: "gcr.io/cloud-builders/docker"
-    entrypoint: bash
-    args:
-      [
-        "-c",
-        "cp /storage/.env ./admin-frontend-web/.env && docker build -t eu.gcr.io/codematic-shared-environment/parentyn-admin-frontend-web:$SHORT_SHA ./admin-frontend-web",
-      ]
-    volumes:
-      - name: "myvolume"
-        path: "/storage"
-  - id: push-image
-    name: "gcr.io/cloud-builders/docker"
-    args:
-      [
-        "push",
-        "eu.gcr.io/codematic-shared-environment/parentyn-admin-frontend-web:$SHORT_SHA",
-      ]
-    volumes:
-      - name: "myvolume"
-        path: "/storage"
-  - id: deploy-image
-    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    entrypoint: gcloud
-    args:
-      [
-        "run",
-        "deploy",
-        "$_GCP_SERVICE_NAME",
-        "--image",
-        "eu.gcr.io/codematic-shared-environment/parentyn-admin-frontend-web:$SHORT_SHA",
-        "--set-env-vars", "NEXTAUTH_URL=$_NEXTAUTH_URL,NEXTAUTH_SECRET=$_NEXTAUTH_SECRET,NEXT_PUBLIC_PARENTYN_API_BASE_URL=$_NEXT_PUBLIC_PARENTYN_API_BASE_URL,NEXT_PARENTYN_API_BASE_URL=$_NEXT_PARENTYN_API_BASE_URL",
-        "--region",
-        "europe-west1",
-        "--allow-unauthenticated",
-      ]
-      
-
+    - id: build-image 
+      name: "gcr.io/cloud-builders/docker" 
+      entrypoint: 'bash'
+      args: 
+        [ 
+          '-c', 
+          "docker build -t eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA ./cloudbuild-generator", 
+        ] 
+    - id: push-image 
+      name: "gcr.io/cloud-builders/docker" 
+      args: 
+        [ 
+          'push', 
+          'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA', 
+        ] 
+    - id: deploy-image 
+      name: "gcr.io/google.com/cloudsdktool/cloud-sdk" 
+      entrypoint: gcloud 
+      args: 
+        [ 
+          'run', 'deploy', 
+          'toolkit-cloudbuild-generator-sandbox', '--image', 'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA;', 
+          '--region', 'europe-west1', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s' 
+        ] 
+    images: ['eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA;'] 

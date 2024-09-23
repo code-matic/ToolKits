@@ -11,12 +11,13 @@ interface ChildComponentProps {
 const SamplePage: React.FC<ChildComponentProps> = () => {
   const [values, setValues] = useState({
     subnetName:"SUBNET_NAME",
-    publicBaseUrl: "_NEXT_PUBLIC_PARENTYN_API_BASE_URL",
+    publicBaseUrl: "NEXT_PUBLIC_API_BASE_URL",
     networkName: 'NETWORK_NAME',
     applicationName: 'APPLICATION_NAME',
     region: 'REGION',
     environment: 'ENVIRONMENT',
     appProjectName: 'APP_PROJECT_NAME',
+    projectId: 'PROJECT_ID'
   });
 
 
@@ -107,7 +108,7 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
             <Txt tab={2}>- | </Txt>
             <span>
             <Txt tab={2}>
-              <Txt tab={.5} endSpace={0}>echo "NEXT_PUBLIC_PARENTYN_API_BASE_URL=$</Txt>
+              <Txt tab={.5} endSpace={0}>echo "NEXT_PUBLIC_API_BASE_URL=$</Txt>
               <DynamicInput field="publicBaseUrl" stateValues={[values, setValues]}/>
               <Txt title='>>' endSpace={0}></Txt>
             
@@ -115,7 +116,7 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
               <DynamicInput field="publicBaseUrl" stateValues={[values, setValues]}/>
             </Txt>
             </span>
-            <Txt tab={1.5}>volumes: 'ubuntu'</Txt> 
+            <Txt tab={1.5}>volumes:</Txt> 
             <Txt tab={1.5}>- name: 'myvolume'</Txt>
             <Txt tab={2}>path: '/storage'</Txt>
 
@@ -124,11 +125,17 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
             <Txt tab={1.5}>entrypoint: 'bash'</Txt>
             <Txt tab={1.5}>args:</Txt>
             <Txt tab={2}>[</Txt>
-            <Txt tab={2.5}>"-c",</Txt>
+            <Txt tab={2.5}>'-c',</Txt>
             <Txt tab={2.5}>
               "cp /storage/.env ./
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
-              /.env && docker build -t eu.gcr.io/codematic-shared-environment/parentyn-admin-frontend-web:$SHORT_SHA ./
+              /.env && docker build -t eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>
+              :$SHORT_SHA ./
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
               ",
             </Txt>
@@ -140,7 +147,7 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
             <Txt tab={2}>[</Txt>
             <Txt tab={2.5}>'push',</Txt>
             <Txt tab={2.5}>
-              'eu.gcr.io/codematic-shared-environment/
+              'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
               <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
@@ -162,7 +169,7 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="environment" stateValues={[values, setValues]}/>', 
-              '--image', 'eu.gcr.io/codematic-shared-environment/
+              '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
               <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
@@ -171,8 +178,17 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
               :$SHORT_SHA;',
             </Txt>
             <Txt tab={2.5}>
-              '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'</Txt>
+              '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'</Txt>
             <Txt tab={2}>]</Txt>
+
+            <Txt tab={1}>images: ['eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>
+              :$SHORT_SHA;']</Txt>
+
 
             </p>
 
