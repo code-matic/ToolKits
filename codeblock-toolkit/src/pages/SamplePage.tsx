@@ -3,14 +3,12 @@ import Txt from '../components/DynamicText';
 import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import prettier from 'prettier';
+import parserYaml from 'prettier/parser-yaml';
 
-interface ChildComponentProps {
-  onValsuesUpdate?: (updatedValues: { subnetName: string ; range: string | string[]; networkName: string; region: string }) => void;
-}
-
-const SamplePage: React.FC<ChildComponentProps> = () => {
+const SamplePage: React.FC = () => {
   const [values, setValues] = useState({
-    subnetName:"SUBNET_NAME",
+    subnetName: "SUBNET_NAME",
     publicBaseUrl: "NEXT_PUBLIC_API_BASE_URL",
     networkName: 'NETWORK_NAME',
     applicationName: 'APPLICATION_NAME',
@@ -20,12 +18,25 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
     projectId: 'PROJECT_ID'
   });
 
-
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Helper function to replace DynamicInput fields with their values
+  const extractDynamicInputValues = (text: string) => {
+    const replacements: { [key: string]: string } = {
+      '<DynamicInput field="publicBaseUrl" />': values.publicBaseUrl,
+      '<DynamicInput field="applicationName" />': values.applicationName,
+      '<DynamicInput field="projectId" />': values.projectId,
+      '<DynamicInput field="appProjectName" />': values.appProjectName,
+      '<DynamicInput field="environment" />': values.environment,
+      '<DynamicInput field="region" />': values.region,
+      // Add other dynamic input replacements as needed
+    };
 
+    // Replace dynamic inputs in the text
+    return text.replace(/<DynamicInput[^>]+>/g, (match) => replacements[match] || match);
+  };
 
-  const handleCopyAllClick = () => {
+  const handleCopyAllClick = async () => {
     if (containerRef.current) {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = containerRef.current.innerHTML;
@@ -34,50 +45,38 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
       const icons = tempDiv.querySelectorAll('.edit-icon');
       icons.forEach((icon) => icon.remove());
 
-      // Get text content line by line from div and p tags
+      // Extract plain text and replace dynamic inputs with actual values
       const textToCopy = Array.from(tempDiv.childNodes)
         .map((node: ChildNode) => (node as HTMLElement).innerText)
-        .join('\n'); // Join text with new lines
+        .join('\n')
+        .replace(/\s+/g, ' ')
+        .trim();
 
-      // Copy the text to clipboard
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        toast.success("Copied to clipboard");
-      });
+      const finalText = extractDynamicInputValues(textToCopy); // Replace dynamic inputs
+
+      try {
+        // Format the content as YAML using Prettier
+        const formattedYaml = await prettier.format(finalText, {
+          parser: 'yaml',
+          plugins: [parserYaml],
+          tabWidth: 2,
+        });
+
+        navigator.clipboard.writeText(formattedYaml).then(() => {
+          toast.success("Copied to clipboard with proper formatting");
+        });
+      } catch (error) {
+        toast.error("Error formatting content.");
+        console.error("Prettier format error:", error);
+      }
     }
   };
 
-  
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        padding: '20px',
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: '#f0f3f4',
-          padding: '20px',
-          borderRadius: '5px',
-          position: 'relative',
-          width: '100%',
-          overflowX: 'auto',
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            justifyContent: 'flex-end',
-            display: 'flex',
-            cursor: 'pointer',
-          }}
-        >
-          <button
-            onClick={handleCopyAllClick}
-            style={{ marginTop: '10px', border: 'none', outline: 'none' }}
-          >
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ backgroundColor: '#f0f3f4', padding: '20px', borderRadius: '5px', position: 'relative', width: '100%', overflowX: 'auto' }}>
+        <div style={{ width: '100%', justifyContent: 'flex-end', display: 'flex', cursor: 'pointer' }}>
+          <button onClick={handleCopyAllClick} style={{ marginTop: '10px', border: 'none', outline: 'none' }}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -89,33 +88,28 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
               strokeLinecap="round"
               strokeLinejoin="round"
               className="lucide lucide-copy">
-                
               <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
               <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
             </svg>
           </button>
         </div>
 
-        {/* Gray Box */}
         <div ref={containerRef}>
           <p className="mb-4">
             <Txt>steps: </Txt>
             <Txt tab={1}>- id: create-env</Txt>
-            <Txt tab={1.5}>name: 'ubuntu'</Txt> 
+            <Txt tab={1.5}>name: 'ubuntu'</Txt>
             <Txt tab={1.5}>entrypoint: 'bash'</Txt>
             <Txt tab={1.5}>args:</Txt>
             <Txt tab={2}>- '-c'</Txt>
             <Txt tab={2}>- | </Txt>
-            <span>
             <Txt tab={2}>
               <Txt tab={.5} endSpace={0}>echo "NEXT_PUBLIC_API_BASE_URL=$</Txt>
-              <DynamicInput field="publicBaseUrl" stateValues={[values, setValues]}/>
+              <DynamicInput field="publicBaseUrl" stateValues={[values, setValues]} />
               <Txt title='>>' endSpace={0}></Txt>
-            
               <Txt>/storage/.env</Txt>
-              <DynamicInput field="publicBaseUrl" stateValues={[values, setValues]}/>
             </Txt>
-            </span>
+            {/* Other Txt and DynamicInput */}
             <Txt tab={1.5}>volumes:</Txt> 
             <Txt tab={1.5}>- name: 'myvolume'</Txt>
             <Txt tab={2}>path: '/storage'</Txt>
@@ -195,24 +189,21 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
           </div>
         </div>
 
-        <ToastContainer
-          position="bottom-left"
-          autoClose={2500}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable={false}
-          pauseOnHover={false}
-          theme="dark"
-          />
-      </div>
+      
+      <ToastContainer
+        position="bottom-left"
+        autoClose={2500}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+        pauseOnHover={false}
+        theme="dark"
+      />
+    </div>
   );
 };
 
 export default SamplePage;
-
-
-
-
