@@ -1,16 +1,13 @@
 FROM node:18-alpine
 
 # The /app directory should act as the main application directory
-WORKDIR /
+WORKDIR /app
 
 # Copy all files
 COPY . .
 
-# Before running npm install, clear the NPM cache
-RUN npm cache clean --force
-
 # RUN npm install
-RUN rm -rf node_modules package-lock.json && npm install
+RUN npm install
 
 #RUN npm build
 RUN npm run build
