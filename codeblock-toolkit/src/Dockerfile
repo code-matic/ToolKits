@@ -6,6 +6,9 @@ WORKDIR /
 # Copy all files
 COPY . .
 
+# Before running npm install, clear the NPM cache
+RUN npm cache clean --force
+
 # RUN npm install
 RUN npm install
 
