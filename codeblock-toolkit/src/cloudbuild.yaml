@@ -1,26 +1,27 @@
-steps: 
+steps:
   - id: build-image
     name: "gcr.io/cloud-builders/docker"
-    entrypoint: 'bash'
     args: [
       'build',
       '-t', 'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA',
-      './codeblock-toolkit/src' 
+      './codeblock-toolkit/src'  # Ensure this path is correct
     ]
+  
   - id: push-image
     name: "gcr.io/cloud-builders/docker"
-    args:
-    [
+    args: [
       'push',
-      'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA',
+      'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA'
     ]
+  
   - id: deploy-image
     name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
-    args:
-    [
+    args: [
       'run', 'deploy',
       'toolkit-cloudbuild-generator-sandbox', '--image', 'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA',
       '--region', 'europe-west1', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
-      ]
-images: ['eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA']
+    ]
+  
+images:
+  - 'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA'
