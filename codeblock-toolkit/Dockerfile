@@ -9,7 +9,7 @@ COPY . ./src
 # RUN npm install
 RUN npm install
 
-EXPOSE 3000
+EXPOSE 8080
 
 # Start the app using serve command
 CMD ["npm", "run", "dev"]
