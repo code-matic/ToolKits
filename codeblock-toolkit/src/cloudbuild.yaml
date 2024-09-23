@@ -4,7 +4,7 @@ steps:
     args: [
       'build',
       '-t', 'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA',
-      '-f', './codeblock-toolkit/src/Dockerfile',
+      '-f', './codeblock-toolkit/Dockerfile',
       './'
     ]
   
