@@ -48,6 +48,10 @@ const tabs = [{
                 <td className="px-4 py-2 border-b">codematic-shared-environment</td>
               </tr>
               <tr>
+                <td className="px-4 py-2 border-b">ENV_BUCKET_URL</td>
+                <td className="px-4 py-2 border-b">envs_store_dev/parentyn/backend</td>
+              </tr>
+              <tr>
                 <td className="px-4 py-2 border-b">ENVIRONMENT</td>
                 <td className="px-4 py-2 border-b">sandbox</td>
               </tr>
