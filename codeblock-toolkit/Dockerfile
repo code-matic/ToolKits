@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:22-alpine
 
 # The /src directory should act as the main application directory
 WORKDIR /src
@@ -8,6 +8,8 @@ COPY . ./src
 
 # RUN npm install
 RUN npm install
+
+RUN npm run build
 
 EXPOSE 8080
 
