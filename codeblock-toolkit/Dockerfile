@@ -9,8 +9,6 @@ COPY . ./src
 # RUN npm install
 RUN npm install
 
-RUN npm run build
-
 EXPOSE 8080
 
 # Start the app using serve command
