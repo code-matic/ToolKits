@@ -1,15 +1,15 @@
 FROM node:22-alpine
 
-# The /src directory should act as the main application directory
-WORKDIR /src
+WORKDIR /codeblock-toolkit
 
-COPY codeblock-toolkit/package.json .
-COPY . ./src
+COPY ./codeblock-toolkit .
 
-# RUN npm install
+WORKDIR /codeblock-toolkit
+
 RUN npm install
+
+RUN npm run build
 
 EXPOSE 8080
 
-# Start the app using serve command
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--", "--port", "8080", "--host"]
