@@ -4,52 +4,50 @@ import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-interface BackendPageProps {
+interface FrontendPageProps {
   values: {
+    envBucketUrl: string;
     applicationName: string;
     region: string;
     environment: string;
     appProjectName: string;
     projectId: string;
-    envBucketUrl: string;
     dockerFilePath: string;
   };
   setValues: React.Dispatch<React.SetStateAction<{
+    envBucketUrl: string;
     applicationName: string;
     region: string;
     environment: string;
     appProjectName: string;
     projectId: string;
-    envBucketUrl: string;
     dockerFilePath: string;
   }>>;
 }
 
-  const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
+const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
-    const containerRef = useRef<HTMLDivElement>(null);
-  
-    const handleCopyAllClick = () => {
-      if (containerRef.current) {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = containerRef.current.innerHTML;
-  
-        // Remove unwanted elements (e.g., icons)
-        const icons = tempDiv.querySelectorAll('.edit-icon');
-        icons.forEach((icon) => icon.remove());
-  
-        // Get text content line by line from div and p tags
-        const textToCopy = Array.from(tempDiv.childNodes)
-          .map((node: ChildNode) => (node as HTMLElement).innerText)
-          .join('\n'); // Join text with new lines
-  
-        // Copy the text to clipboard
-        navigator.clipboard.writeText(textToCopy).then(() => {
-          toast.success("Copied to clipboard");
-        });
-      }
-    };
-  
+  const handleCopyAllClick = () => {
+    if (containerRef.current) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = containerRef.current.innerHTML;
+
+      // Remove unwanted elements (e.g., icons)
+      const icons = tempDiv.querySelectorAll('.edit-icon');
+      icons.forEach((icon) => icon.remove());
+
+      // Get text content line by line from div and p tags
+      const textToCopy = Array.from(tempDiv.childNodes)
+        .map((node: ChildNode) => (node as HTMLElement).innerText)
+        .join('\n');
+
+      // Copy the text to clipboard
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        toast.success("Copied to clipboard");
+      });
+    }
+  };
 
   return (
     <div
@@ -91,8 +89,8 @@ interface BackendPageProps {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="lucide lucide-copy">
-                
+              className="lucide lucide-copy"
+            >
               <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
               <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
             </svg>
@@ -169,20 +167,20 @@ interface BackendPageProps {
           </div>
         </div>
 
-      <ToastContainer
-        position="bottom-left"
-        autoClose={2500}
-        hideProgressBar
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable={false}
-        pauseOnHover={false}
-        theme="dark"
-      />
-    </div>
+        <ToastContainer
+          position="bottom-left"
+          autoClose={2500}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable={false}
+          pauseOnHover={false}
+          theme="dark"
+        />
+      </div>
   );
 };
 
-export default BackendPage;
+export default FrontendPage;

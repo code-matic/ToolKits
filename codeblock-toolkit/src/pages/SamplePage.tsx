@@ -3,6 +3,8 @@ import Txt from '../components/DynamicText';
 import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import prettier from 'prettier';
+import parserYaml from 'prettier/parser-yaml';
 
 interface ChildComponentProps {
   onValsuesUpdate?: (updatedValues: { subnetName: string ; range: string | string[]; networkName: string; region: string }) => void;
@@ -25,25 +27,38 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
 
 
 
-  const handleCopyAllClick = () => {
+  const handleCopyAllClick = async () => {
     if (containerRef.current) {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = containerRef.current.innerHTML;
-
+  
       // Remove unwanted elements (e.g., icons)
       const icons = tempDiv.querySelectorAll('.edit-icon');
       icons.forEach((icon) => icon.remove());
-
+  
       // Get text content line by line from div and p tags
-      const textToCopy = Array.from(tempDiv.childNodes)
+      let textToCopy = Array.from(tempDiv.childNodes)
         .map((node: ChildNode) => (node as HTMLElement).innerText)
         .join('\n'); // Join text with new lines
-        
-
-      // Copy the text to clipboard
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        toast.success("Copied to clipboard");
-      });
+      
+      // Replace multiple spaces with a single space and trim
+      textToCopy = textToCopy.replace(/\s+/g, ' ').trim();
+  
+      try {
+        // Await the formatting operation since it returns a Promise
+        const formattedYaml = await prettier.format(textToCopy, {
+          parser: 'yaml',
+          plugins: [parserYaml],
+          tabWidth: 2, // Adjust the indentation level as required
+        });
+  
+        // Copy the formatted YAML to clipboard (also awaited)
+        await navigator.clipboard.writeText(formattedYaml);
+        toast.success('Copied to clipboard with proper formatting');
+      } catch (error) {
+        console.error('Error formatting YAML:', error);
+        toast.error('Failed to format and copy YAML.');
+      }
     }
   };
 
