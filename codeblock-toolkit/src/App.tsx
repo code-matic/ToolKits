@@ -26,6 +26,7 @@ function App() {
     projectId: 'PROJECT_ID',
     envBucketUrl: 'ENV_BUCKET_URL',
     dockerFilePath: 'DOCKER_FILE_PATH',
+    migrationScriptPath: 'MIGRATION_SCRIPT_PATH',
   });
 
   const handleDropdown = (index: number) => {

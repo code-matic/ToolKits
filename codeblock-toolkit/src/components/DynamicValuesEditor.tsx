@@ -19,7 +19,7 @@ const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, 
 
   // Define fields for frontend and backend separately
   const frontendFields = ['dockerFilePath', 'projectId', 'appProjectName', 'applicationName', 'region', 'environment', 'envBucketUrl'];
-  const backendFields = ['dockerFilePath', 'projectId', 'appProjectName', 'applicationName', 'region', 'environment', 'envBucketUrl'];
+  const backendFields = ['dockerFilePath', 'projectId', 'appProjectName', 'applicationName', 'region', 'environment', 'envBucketUrl', 'migrationScriptPath'];
 
   // Dynamically choose fields based on configType
   const fieldsToDisplay = configType === 'frontend' ? frontendFields : backendFields;

@@ -13,6 +13,7 @@ interface BackendPageProps {
     projectId: string;
     envBucketUrl: string;
     dockerFilePath: string;
+    migrationScriptPath: string;
   };
   setValues: React.Dispatch<React.SetStateAction<{
     applicationName: string;
@@ -22,6 +23,7 @@ interface BackendPageProps {
     projectId: string;
     envBucketUrl: string;
     dockerFilePath: string;
+    migrationScriptPath: string;
   }>>;
 }
 
@@ -139,6 +141,31 @@ interface BackendPageProps {
               :$SHORT_SHA'
             </Txt>
             <Txt tab={1.5}>]</Txt>
+
+            <Txt tab={1}>- id: migration-job</Txt>
+            <Txt tab={1.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+            <Txt tab={1.5}>entrypoint: gcloud</Txt>
+            <Txt tab={1.5}>args: [</Txt>
+            <Txt tab={2}>'run', 'jobs', 'deploy',</Txt>
+            <Txt tab={2}>
+              '<DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>', 
+              '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>
+              :$SHORT_SHA',
+            </Txt>
+            <Txt tab={2}>
+              '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--command', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]}/>'</Txt>
+            <Txt tab={1.5}>]</Txt>
+
+
 
             <Txt tab={1}>- id: deploy-image</Txt>
             <Txt tab={1.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
