@@ -4,8 +4,6 @@ WORKDIR /codeblock-toolkit
 
 COPY ./codeblock-toolkit .
 
-WORKDIR /codeblock-toolkit
-
 RUN npm install
 
 RUN npm run build

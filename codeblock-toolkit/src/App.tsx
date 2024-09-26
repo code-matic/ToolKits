@@ -57,12 +57,20 @@ function App() {
         {/* User Guide */}
         <UserGuide />
 
+        </div>
+
+        <div className="border border-gray-500 w-[1200px] mx-auto mt-5 h-[100%] rounded-lg">
+
         {/* Dynamic Values Editor */}
         <DynamicValuesEditor
           values={tabIndex === 0 ? frontendValues : backendValues} // Display appropriate values
           setValues={tabIndex === 0 ? setFrontendValues : setBackendValues} // Set appropriate values
           configType={tabIndex === 0 ? 'frontend' : 'backend'} // Pass correct config type
         />
+
+      </div>
+
+      <div className="border border-gray-500 w-[1200px] mx-auto mt-5 h-[100%] rounded-lg">
 
         <div className="flex border-b border-gray-500">
           {tabs.map((item, index) => (
