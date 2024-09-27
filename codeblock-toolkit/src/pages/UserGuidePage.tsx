@@ -14,13 +14,14 @@ const UserGuidePage = () => {
         <p>How to get your <strong>envBucketUrl</strong>:</p>
         <ol className="list-decimal list-inside ml-4">
           <li>
-            Navigate to cloud storage here:
+            Navigate to cloud storage here: 
             <a
               href="https://console.cloud.google.com/storage/browser?referrer=search&project=codematic-shared-environment&prefix=&forceOnBucketsSortingFiltering=true"
               target="_blank"
               rel="noopener noreferrer"
+              className="font-bold underline text-blue-600"
             >
-              Cloud Storage
+               Cloud Storage
             </a>
           </li>
           <li>Confirm that you are in the right project and either create a bucket for your .env file or use an existing bucket.</li>
