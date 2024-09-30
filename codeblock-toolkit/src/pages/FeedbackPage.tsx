@@ -21,7 +21,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onClose }) => {
       suggestions,
     };
 
-    const scriptURL = process.env.APP_SCRIPT_URL;
+    const scriptURL = process.env.REACT_APP_SCRIPT_URL;
 
     if (!scriptURL) {
       console.error('Google Apps Script URL is not defined.');
