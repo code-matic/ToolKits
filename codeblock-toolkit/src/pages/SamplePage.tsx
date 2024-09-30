@@ -3,8 +3,6 @@ import Txt from '../components/DynamicText';
 import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import prettier from 'prettier';
-import parserYaml from 'prettier/parser-yaml';
 
 interface ChildComponentProps {
   onValsuesUpdate?: (updatedValues: { subnetName: string ; range: string | string[]; networkName: string; region: string }) => void;
@@ -25,40 +23,25 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-
-
-  const handleCopyAllClick = async () => {
+  const handleCopyAllClick = () => {
     if (containerRef.current) {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = containerRef.current.innerHTML;
-  
+
       // Remove unwanted elements (e.g., icons)
       const icons = tempDiv.querySelectorAll('.edit-icon');
       icons.forEach((icon) => icon.remove());
-  
+
       // Get text content line by line from div and p tags
-      let textToCopy = Array.from(tempDiv.childNodes)
+      const textToCopy = Array.from(tempDiv.childNodes)
         .map((node: ChildNode) => (node as HTMLElement).innerText)
-        .join('\n'); // Join text with new lines
-      
-      // Replace multiple spaces with a single space and trim
-      textToCopy = textToCopy.replace(/\s+/g, ' ').trim();
-  
-      try {
-        // Await the formatting operation since it returns a Promise
-        const formattedYaml = await prettier.format(textToCopy, {
-          parser: 'yaml',
-          plugins: [parserYaml],
-          tabWidth: 2, // Adjust the indentation level as required
-        });
-  
-        // Copy the formatted YAML to clipboard (also awaited)
-        await navigator.clipboard.writeText(formattedYaml);
-        toast.success('Copied to clipboard with proper formatting');
-      } catch (error) {
-        console.error('Error formatting YAML:', error);
-        toast.error('Failed to format and copy YAML.');
-      }
+        .join('\n');
+
+
+      // Copy the text to clipboard
+      navigator.clipboard.writeText(textToCopy.replace(/\u00A0/g, ' ')).then(() => {
+        toast.success("Copied to clipboard");
+      });
     }
   };
 
@@ -114,34 +97,35 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
 
         {/* Gray Box */}
         <div ref={containerRef}>
+        
           <p className="mb-4">
             <Txt>steps: </Txt>
-            <Txt tab={1}>- id: create-env</Txt>
-            <Txt tab={1.5}>name: 'ubuntu'</Txt> 
-            <Txt tab={1.5}>entrypoint: 'bash'</Txt>
-            <Txt tab={1.5}>args:</Txt>
-            <Txt tab={2}>- '-c'</Txt>
-            <Txt tab={2}>- | </Txt>
+            <Txt>- id: create-env</Txt>
+            <Txt tab={0.5}>name: 'ubuntu'</Txt> 
+            <Txt tab={0.5}>entrypoint: 'bash'</Txt>
+            <Txt tab={0.5}>args:</Txt>
+            <Txt tab={1}>- '-c'</Txt>
+            <Txt tab={1}>- | </Txt>
             <span>
-            <Txt tab={2}>
-              <Txt tab={.5} endSpace={0}>echo "NEXT_PUBLIC_API_BASE_URL=$</Txt>
+            <Txt tab={1}>
+              <Txt tab={.5}>echo "NEXT_PUBLIC_API_BASE_URL=$</Txt>
               <DynamicInput field="publicBaseUrl" stateValues={[values, setValues]}/>
               <Txt title='>>' endSpace={0}></Txt>
             
               <Txt>/storage/.env</Txt>
             </Txt>
             </span>
-            <Txt tab={1.5}>volumes:</Txt> 
-            <Txt tab={1.5}>- name: 'myvolume'</Txt>
-            <Txt tab={2}>path: '/storage'</Txt>
+            <Txt tab={.5}>volumes:</Txt> 
+            <Txt tab={.5}>- name: 'myvolume'</Txt>
+            <Txt tab={1}>path: '/storage'</Txt>
 
-            <Txt tab={1}>- id: build-image</Txt>
-            <Txt tab={1.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={1.5}>entrypoint: 'bash'</Txt>
-            <Txt tab={1.5}>args:</Txt>
-            <Txt tab={2}>[</Txt>
-            <Txt tab={2.5}>'-c',</Txt>
-            <Txt tab={2.5}>
+            <Txt>- id: build-image</Txt>
+            <Txt tab={.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+            <Txt tab={.5}>entrypoint: 'bash'</Txt>
+            <Txt tab={.5}>args:</Txt>
+            <Txt tab={1}>[</Txt>
+            <Txt tab={1.5}>'-c',</Txt>
+            <Txt tab={1.5}>
               "cp /storage/.env ./
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
               /.env && docker build -t eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
@@ -154,14 +138,14 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
               ",
             </Txt>
-            <Txt tab={2}>]</Txt>
+            <Txt tab={1}>]</Txt>
 
-            <Txt tab={1}>- id: push-image</Txt>
-            <Txt tab={1.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={1.5}>args:</Txt>
-            <Txt tab={2}>[</Txt>
-            <Txt tab={2.5}>'push',</Txt>
-            <Txt tab={2.5}>
+            <Txt>- id: push-image</Txt>
+            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+            <Txt tab={.5}>args:</Txt>
+            <Txt tab={1}>[</Txt>
+            <Txt tab={1.5}>'push',</Txt>
+            <Txt tab={1.5}>
               'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
               <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
               -
@@ -170,15 +154,15 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
               <DynamicInput field="environment" stateValues={[values, setValues]}/>
               :$SHORT_SHA',
             </Txt>
-            <Txt tab={2}>]</Txt>
+            <Txt tab={1}>]</Txt>
 
-            <Txt tab={1}>- id: deploy-image</Txt>
-            <Txt tab={1.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
-            <Txt tab={1.5}>entrypoint: gcloud</Txt>
-            <Txt tab={1.5}>args:</Txt>
-            <Txt tab={2}>[</Txt>
-            <Txt tab={2.5}>'run', 'deploy',</Txt>
-            <Txt tab={2.5}>
+            <Txt>- id: deploy-image</Txt>
+            <Txt tab={.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+            <Txt tab={.5}>entrypoint: gcloud</Txt>
+            <Txt tab={.5}>args:</Txt>
+            <Txt tab={1}>[</Txt>
+            <Txt tab={1.5}>'run', 'deploy',</Txt>
+            <Txt tab={1.5}>
               '<DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
@@ -192,11 +176,11 @@ const SamplePage: React.FC<ChildComponentProps> = () => {
               <DynamicInput field="environment" stateValues={[values, setValues]}/>
               :$SHORT_SHA',
             </Txt>
-            <Txt tab={2.5}>
+            <Txt tab={1.5}>
               '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'</Txt>
-            <Txt tab={2}>]</Txt>
+            <Txt tab={1}>]</Txt>
 
-            <Txt tab={1}>images: ['eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+            <Txt>images: ['eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
               <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>

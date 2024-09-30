@@ -4,6 +4,7 @@ import BackendPage from "./pages/backendPage";
 import DynamicValuesEditor from './components/DynamicValuesEditor';
 import UserGuide from './pages/UserGuidePage';
 import FeedbackForm from './pages/FeedbackPage';
+import SamplePage from './pages/SamplePage';
 
 function App() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -52,6 +53,11 @@ function App() {
         values={backendValues} 
         setValues={setBackendValues} // Pass setValues prop to update backend values
       />
+    )
+  }, {
+    name: "Sample Page",
+    component: (
+      <SamplePage/>
     )
   }];
 
