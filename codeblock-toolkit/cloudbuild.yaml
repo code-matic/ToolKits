@@ -1,4 +1,8 @@
 steps:
+  - id: pull-env 
+    name: 'gcr.io/cloud-builders/gsutil' 
+    args: [ 
+      'cp', 'gs://envs_store_dev/cloudbuild-generator/.env', './codeblock-toolkit/.env']
   - id: build-image
     name: "gcr.io/cloud-builders/docker"
     args: [

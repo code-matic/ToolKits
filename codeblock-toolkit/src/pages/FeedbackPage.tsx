@@ -21,8 +21,15 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onClose }) => {
       suggestions,
     };
 
+    const scriptURL = import.meta.env.VITE_APP_SCRIPT_URL;
+
+    if (!scriptURL) {
+      console.error('Google Apps Script URL is not defined.');
+      return;
+    }
+
     // Send form data to the Google Apps Script web app
-    fetch('https://script.google.com/macros/s/AKfycbwRe9gPjmtKoVNkSOog1VYj7Ncl-zPl5-thY_MLZxgf41qIylYtmhXSQO1mPDN_bGxNmg/exec', {
+    fetch(scriptURL, {
       method: 'POST',
       body: JSON.stringify(formData),
       mode: "no-cors",
