@@ -43,7 +43,7 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
         .join('\n');
 
       // Copy the text to clipboard
-      navigator.clipboard.writeText(textToCopy).then(() => {
+      navigator.clipboard.writeText(textToCopy.replace(/\u00A0/g, ' ')).then(() => {
         toast.success("Copied to clipboard");
       });
     }
@@ -101,33 +101,33 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
         <div ref={containerRef}>
           <p className="mb-4">
             <Txt>steps: </Txt>
-            <Txt tab={1}>- id: pull-env</Txt>
-            <Txt tab={1.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt> 
-            <Txt tab={1.5}>args: [</Txt>
-            <Txt tab={2}>'cp', 'gs://
+            <Txt>- id: pull-env</Txt>
+            <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt> 
+            <Txt tab={0.5}>args: [</Txt>
+            <Txt tab={1}>'cp', 'gs://
             <DynamicInput field="envBucketUrl" stateValues={[values, setValues]}/>
             /.env', './<DynamicInput field="applicationName" stateValues={[values, setValues]}/>/.env']</Txt>
 
-            <Txt tab={1}>- id: build-image</Txt>
-            <Txt tab={1.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={1.5}>entrypoint: 'bash'</Txt>
-            <Txt tab={1.5}>args: [</Txt>
-            <Txt tab={2}>'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+            <Txt>- id: build-image</Txt>
+            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+            <Txt tab={0.5}>entrypoint: 'bash'</Txt>
+            <Txt tab={0.5}>args: [</Txt>
+            <Txt tab={1}>'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
               <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="environment" stateValues={[values, setValues]}/>
               :$SHORT_SHA', '-f', './<DynamicInput field="dockerFilePath" stateValues={[values, setValues]}/>/Dockerfile', 
-              './<DynamicInput field="applicationName" stateValues={[values, setValues]}/>,
+              './<DynamicInput field="applicationName" stateValues={[values, setValues]}/>'
             </Txt>
-            <Txt tab={1.5}>]</Txt>
+            <Txt tab={0.5}>]</Txt>
 
-            <Txt tab={1}>- id: push-image</Txt>
-            <Txt tab={1.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={1.5}>args: [</Txt>
-            <Txt tab={2}>'push',</Txt>
-            <Txt tab={2}>
+            <Txt>- id: push-image</Txt>
+            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+            <Txt tab={0.5}>args: [</Txt>
+            <Txt tab={1}>'push',</Txt>
+            <Txt tab={1}>
               'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
               <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
               -
@@ -136,14 +136,14 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
               <DynamicInput field="environment" stateValues={[values, setValues]}/>
               :$SHORT_SHA'
             </Txt>
-            <Txt tab={1.5}>]</Txt>
+            <Txt tab={0.5}>]</Txt>
 
-            <Txt tab={1}>- id: deploy-image</Txt>
-            <Txt tab={1.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
-            <Txt tab={1.5}>entrypoint: gcloud</Txt>
-            <Txt tab={1.5}>args: [</Txt>
-            <Txt tab={2}>'run', 'deploy',</Txt>
-            <Txt tab={2}>
+            <Txt>- id: deploy-image</Txt>
+            <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+            <Txt tab={0.5}>entrypoint: gcloud</Txt>
+            <Txt tab={0.5}>args: [</Txt>
+            <Txt tab={1}>'run', 'deploy',</Txt>
+            <Txt tab={1}>
               '<DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
@@ -157,9 +157,9 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
               <DynamicInput field="environment" stateValues={[values, setValues]}/>
               :$SHORT_SHA',
             </Txt>
-            <Txt tab={2}>
+            <Txt tab={1}>
               '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'</Txt>
-            <Txt tab={1.5}>]</Txt>
+            <Txt tab={0.5}>]</Txt>
 
 
             </p>
