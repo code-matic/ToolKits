@@ -64,45 +64,47 @@ interface BackendPageProps {
       <div
         style={{
           backgroundColor: '#f0f3f4',
-          padding: '20px',
+          padding: '0', // Remove padding around the banner section
           borderRadius: '5px',
           position: 'relative',
           width: '100%',
           overflowX: 'auto',
         }}
-      >
-        <div
-          style={{
-            width: '100%',
-            justifyContent: 'flex-end',
-            display: 'flex',
-            cursor: 'pointer',
-          }}
         >
-          <button
-            onClick={handleCopyAllClick}
-            style={{ marginTop: '10px', border: 'none', outline: 'none' }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-copy">
-                
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-            </svg>
-          </button>
+          {/* Your Output Banner and Copy Button */}
+        <div className="w-full flex justify-between items-center bg-[#2563EB] text-white p-4 mb-4" 
+          style={{ margin: '0', padding: '0 70px', height: '71px' }} // Added more padding for left and right
+        >
+          <h2 className="font-semibold">Your Output</h2> {/* Increased font size */}
+          
+          {/* Copy Text and Copy Button */}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span className="font-semibold" style={{ marginRight: '10px' }}>Copy Text</span>
+            <button
+              onClick={handleCopyAllClick}
+              style={{ border: 'none', outline: 'none', cursor: 'pointer' }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32" // Increased button size
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-copy"
+              >
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Gray Box */}
-        <div ref={containerRef}>
+        <div ref={containerRef} style={{ padding: '20px' }}>
           <p className="mb-4">
             <Txt>steps: </Txt>
             <Txt>- id: pull-env</Txt>

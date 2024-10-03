@@ -29,7 +29,7 @@ const DynamicInput: React.FC<EditableFieldProps> = ({
       style={{
         position: 'relative',
         display: 'inline-block',
-        border: '1px solid #ccc',
+        border: '1px solid #2563EB',
         backgroundColor: '#fff',
         borderRadius: '4px',
         padding: '0px 2px',
@@ -67,7 +67,7 @@ const DynamicInput: React.FC<EditableFieldProps> = ({
   ) : (
     <span
       onClick={() => setIsEditing(true)}
-      style={{ cursor: 'pointer', color: '#d01884', display: 'inline-block' }}>
+      style={{ cursor: 'pointer', color: '#2563EB', display: 'inline-block' }}>
       {values[field]}
       <span className="edit-icon ml-2" style={{ display: 'inline-block' }}>
         <Editicon />

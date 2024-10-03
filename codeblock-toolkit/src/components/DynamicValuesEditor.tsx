@@ -25,7 +25,7 @@ const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, 
   const fieldsToDisplay = configType === 'frontend' ? frontendFields : backendFields;
 
   return (
-    <div className="user-guide p-4 mb-6 border border-gray-300 rounded-lg bg-gray-100">
+    <div className="user-guide p-4 mb-6">
       <h2 className="text-lg font-semibold mb-4">Edit {configType === 'frontend' ? 'Frontend' : 'Backend'} Dynamic Values</h2>
       <form className="grid grid-cols-2 gap-4 mb-8">
         {fieldsToDisplay.map((key) => (
@@ -39,7 +39,7 @@ const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, 
               name={key}
               value={values[key as keyof typeof values]} 
               onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-md"
+              className="p-2 border border-[#00000066] rounded-md"
             />
           </div>
         ))}

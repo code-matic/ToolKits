@@ -1,18 +1,19 @@
 const UserGuidePage = () => {
   return (
-    <div className="user-guide p-4 mb-6 border border-gray-300 rounded-lg bg-gray-100">
+    <div className="user-guide p-4 mb-6 rounded-lg bg-[#FFFFFF]">
       <h2 className="text-lg font-bold mb-3">User Guide</h2>
       <p>
         Welcome to the configuration page. Below is a brief description of each dynamic value used in the application and what it should be replaced with:
       </p>
+      
       <ul className="space-y-6">
-        <li className="relative pl-6">
+        <li className="relative pl-6 mt-6">
           <span className="absolute left-0 top-0">›</span>
           <strong>envBucketUrl</strong>: Replace with the URL path to the location in the storage bucket that your env file is located.
           (e.g., <code>envs_store_dev/parentyn/backend</code>).
         </li>
-        <p>How to get your <strong>envBucketUrl</strong>:</p>
-        <ol className="list-decimal list-inside ml-4">
+        <p className="mt-4 pl-6"><strong>How to get your envBucketUrl</strong>:</p>
+        <ol className="list-decimal list-inside ml-4 pl-6">
           <li>
             Navigate to cloud storage here: 
             <a
@@ -25,22 +26,27 @@ const UserGuidePage = () => {
             </a>
           </li>
           <li>Confirm that you are in the right project and either create a bucket for your .env file or use an existing bucket.</li>
-          <li>
+          <li className="mb-10">
             Click the copy button in the highlighted section of this picture to retrieve your <strong>envBucketUrl</strong>:
             <img
               src="https://storage.googleapis.com/toolkit-cloudbuild-generator/Copying%20envBucketUrl%20path.png"
               alt="Copying envBucketUrl"
-              className="mt-2"
+              className="mt-6 rounded-lg border-black border-4"
             />
           </li>
+
         </ol>
 
         <li className="relative pl-6">
           <span className="absolute left-0 top-0">›</span>
           <strong>migrationScriptPath</strong>: Replace with the path to your migration script and the name of your migration script (e.g., <code>./migrate.sh</code> or <code>./backend/job.sh</code>).
-          <p className="mt-4">Migration Script path only applies if you are running a backend configuration.</p>
-          <p className="mt-4">How to set up and get your <strong>migrationScriptPath</strong>:</p>
-          <ol className="list-decimal list-inside ml-4 space-y-3">
+          <p className="mt-4">
+            <strong><em>N.B. The Migration step in the backend configuration is optional and only applies if you are running a Backend application relying on SQL databases.</em></strong>
+          </p>
+
+
+          <p className="mt-4"><strong>How to set up and get your migrationScriptPath</strong>:</p>
+          <ol className="list-decimal list-inside ml-4 mt-4 space-y-3">
             <li>Create a migration script in your project.</li>
             <li>
               Sample migration script:
