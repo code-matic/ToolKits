@@ -5,7 +5,6 @@ steps:
     'cp', 'gs://envs_store_dev/cloudbuild-generator/.env', './cloudbuild-generator/.env']
 - id: build-image
   name: "gcr.io/cloud-builders/docker"
-  entrypoint: 'bash'
   args: [
     'build', '-t', 'eu.gcr.io/codematic-shared-environment/toolkit-cloudbuild-generator-sandbox:$SHORT_SHA', '-f', './codeblock-toolkit/Dockerfile', './'
   ]
