@@ -6,7 +6,7 @@ COPY cloudbuild-generator/.env .
 
 COPY ./codeblock-toolkit .
 
-RUN ls -la /codeblock-toolkit
+RUN ls -la /cloudbuild-generator
 
 RUN npm install
 
