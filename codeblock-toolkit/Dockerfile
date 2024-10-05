@@ -2,9 +2,11 @@ FROM node:22-alpine
 
 WORKDIR /cloudbuild-generator
 
-COPY ./cloudbuild-generator/.env .
+COPY cloudbuild-generator/.env .
 
 COPY ./codeblock-toolkit .
+
+RUN ls -la /codeblock-toolkit
 
 RUN npm install
 
