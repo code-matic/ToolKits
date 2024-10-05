@@ -113,14 +113,13 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
 
             <Txt>- id: build-image</Txt>
             <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={0.5}>entrypoint: 'bash'</Txt>
             <Txt tab={0.5}>args: [</Txt>
             <Txt tab={1}>'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
               /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
               -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
               -<DynamicInput field="environment" stateValues={[values, setValues]} />
               :$SHORT_SHA', '-f', './<DynamicInput field="dockerFilePath" stateValues={[values, setValues]} />
-              /Dockerfile', './<DynamicInput field="applicationName" stateValues={[values, setValues]} />'
+              /Dockerfile', './'
             </Txt>
             <Txt tab={0.5}>]</Txt>
 
