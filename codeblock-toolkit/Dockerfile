@@ -8,6 +8,8 @@ COPY ./codeblock-toolkit .
 
 RUN ls -la /cloudbuild-generator
 
+RUN cat /cloudbuild-generator/.env
+
 RUN npm install
 
 RUN npm run build
