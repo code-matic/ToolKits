@@ -1,6 +1,6 @@
 FROM node:22-alpine
 
-WORKDIR /codeblock-toolkit
+WORKDIR /cloudbuild-generator
 
 COPY ./codeblock-toolkit .
 
