@@ -58,6 +58,10 @@ function App() {
   return (
     <section className="relative"> {/* Added 'relative' to position the feedback button */}
       {/* Show the User Guide first */}
+      <header className="text-center bg-white py-4">
+        <h1 className="text-5xl font-bold text-[#2563EB]">CLOUDBUILD GENERATOR</h1>
+      </header>
+
       {showUserGuide ? (
         <div className="max-w-screen-lg mx-auto mt-5 h-full rounded-lg p-4">
           <div className="flex justify-end mt-5">
