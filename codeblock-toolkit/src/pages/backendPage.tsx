@@ -123,7 +123,7 @@ interface BackendPageProps {
               <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
               -
               <DynamicInput field="environment" stateValues={[values, setValues]}/>
-              :$SHORT_SHA', '-f', './<DynamicInput field="dockerFilePath" stateValues={[values, setValues]}/>/Dockerfile', 
+              :$SHORT_SHA', '-f', './<DynamicInput field="dockerFilePath" stateValues={[values, setValues]}/>Dockerfile', 
               './'
             </Txt>
             <Txt tab={0.5}>]</Txt>

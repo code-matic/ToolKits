@@ -119,7 +119,7 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
               -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
               -<DynamicInput field="environment" stateValues={[values, setValues]} />
               :$SHORT_SHA', '-f', './<DynamicInput field="dockerFilePath" stateValues={[values, setValues]} />
-              /Dockerfile', './'
+              Dockerfile', './'
             </Txt>
             <Txt tab={0.5}>]</Txt>
 
