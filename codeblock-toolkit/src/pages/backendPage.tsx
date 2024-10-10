@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Txt from '../components/DynamicText';
 import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,52 +6,55 @@ import 'react-toastify/dist/ReactToastify.css';
 
 interface BackendPageProps {
   values: {
+    envBucketUrl: string;
     applicationName: string;
     region: string;
     environment: string;
     appProjectName: string;
     projectId: string;
-    envBucketUrl: string;
-    dockerFilePath: string;
     migrationScriptPath: string;
   };
   setValues: React.Dispatch<React.SetStateAction<{
+    envBucketUrl: string;
     applicationName: string;
     region: string;
     environment: string;
     appProjectName: string;
     projectId: string;
-    envBucketUrl: string;
-    dockerFilePath: string;
     migrationScriptPath: string;
   }>>;
 }
 
-  const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
+const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
-    const containerRef = useRef<HTMLDivElement>(null);
-  
-    const handleCopyAllClick = () => {
-      if (containerRef.current) {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = containerRef.current.innerHTML;
-  
-        // Remove unwanted elements (e.g., icons)
-        const icons = tempDiv.querySelectorAll('.edit-icon');
-        icons.forEach((icon) => icon.remove());
-  
-        // Get text content line by line from div and p tags
-        const textToCopy = Array.from(tempDiv.childNodes)
-          .map((node: ChildNode) => (node as HTMLElement).innerText)
-          .join('\n'); // Join text with new lines
-  
-        // Copy the text to clipboard
-        navigator.clipboard.writeText(textToCopy.replace(/\u00A0/g, ' ')).then(() => {
-          toast.success("Copied to clipboard");
-        });
-      }
-    };
-  
+  // State for toggling each step
+  const [isPullEnvEnabled, setPullEnvEnabled] = useState(true);
+  const [isBuildImageEnabled, setBuildImageEnabled] = useState(true);
+  const [isPushImageEnabled, setPushImageEnabled] = useState(true);
+  const [isMigrationJobEnabled, setMigrationJobEnabled] = useState(true);
+  const [isDeployImageEnabled, setDeployImageEnabled] = useState(true);
+
+  const handleCopyAllClick = () => {
+    if (containerRef.current) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = containerRef.current.innerHTML;
+
+      // Remove unwanted elements (e.g., icons)
+      const icons = tempDiv.querySelectorAll('.edit-icon');
+      icons.forEach((icon) => icon.remove());
+
+      // Get text content line by line from div and p tags
+      const textToCopy = Array.from(tempDiv.childNodes)
+        .map((node: ChildNode) => (node as HTMLElement).innerText)
+        .join('\n');
+
+      // Copy the text to clipboard
+      navigator.clipboard.writeText(textToCopy.replace(/\u00A0/g, ' ')).then(() => {
+        toast.success("Copied to clipboard");
+      });
+    }
+  };
 
   return (
     <div
@@ -70,8 +73,9 @@ interface BackendPageProps {
           width: '100%',
           overflowX: 'auto',
         }}
-        >
-          {/* Your Output Banner and Copy Button */}
+      >
+
+        {/* Your Output Banner and Copy Button */}
         <div className="w-full flex justify-between items-center bg-[#2563EB] text-white p-4 mb-4" 
           style={{ margin: '0', padding: '0 70px', height: '71px' }} // Added more padding for left and right
         >
@@ -103,112 +107,133 @@ interface BackendPageProps {
           </div>
         </div>
 
-        {/* Gray Box */}
+        {/* Toggle Switches */}
+        <div style={{ padding: '20px' }}>
+          <label>
+            <input type="checkbox" checked={isPullEnvEnabled} onChange={() => setPullEnvEnabled(!isPullEnvEnabled)} />
+            Include Pull Env Step
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" checked={isBuildImageEnabled} onChange={() => setBuildImageEnabled(!isBuildImageEnabled)} />
+            Include Build Image Step
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" checked={isPushImageEnabled} onChange={() => setPushImageEnabled(!isPushImageEnabled)} />
+            Include Push Image Step
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" checked={isMigrationJobEnabled} onChange={() => setMigrationJobEnabled(!isMigrationJobEnabled)} />
+            Include Migration Job Step
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" checked={isDeployImageEnabled} onChange={() => setDeployImageEnabled(!isDeployImageEnabled)} />
+            Include Deploy Image Step
+          </label>
+        </div>
+
+        {/* Gray Box with Padding for Code Block */}
         <div ref={containerRef} style={{ padding: '20px' }}>
           <p className="mb-4">
             <Txt>steps: </Txt>
-            <Txt>- id: pull-env</Txt>
-            <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt> 
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'cp', 'gs://
-            <DynamicInput field="envBucketUrl" stateValues={[values, setValues]}/>
-            /.env', './<DynamicInput field="applicationName" stateValues={[values, setValues]}/>/.env']</Txt>
 
-            <Txt>- id: build-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
-              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="environment" stateValues={[values, setValues]}/>
-              :$SHORT_SHA', '-f', './<DynamicInput field="dockerFilePath" stateValues={[values, setValues]}/>Dockerfile', 
-              './'
-            </Txt>
-            <Txt tab={0.5}>]</Txt>
+            {isPullEnvEnabled && (
+              <>
+                <Txt>- id: pull-env</Txt>
+                <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt> 
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'cp', 'gs://<DynamicInput field="envBucketUrl" stateValues={[values, setValues]} />/.env', './<DynamicInput field="applicationName" stateValues={[values, setValues]} />/.env']</Txt>
+              </>
+            )}
 
-            <Txt>- id: push-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'push',</Txt>
-            <Txt tab={1}>
-              'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
-              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="environment" stateValues={[values, setValues]}/>
-              :$SHORT_SHA'
-            </Txt>
-            <Txt tab={0.5}>]</Txt>
+            {isBuildImageEnabled && (
+              <>
+                <Txt>- id: build-image</Txt>
+                <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
+                  /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="environment" stateValues={[values, setValues]} />
+                  :$SHORT_SHA', '-f', './Dockerfile', './'
+                </Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
 
-            <Txt>- id: migration-job</Txt>
-            <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
-            <Txt tab={0.5}>entrypoint: gcloud</Txt>
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'run', 'jobs', 'deploy',</Txt>
-            <Txt tab={1}>
-              '<DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="environment" stateValues={[values, setValues]}/>', 
-              '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
-              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="environment" stateValues={[values, setValues]}/>
-              :$SHORT_SHA',
-            </Txt>
-            <Txt tab={1}>
-              '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--command', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]}/>'</Txt>
-            <Txt tab={0.5}>]</Txt>
+            {isPushImageEnabled && (
+              <>
+                <Txt>- id: push-image</Txt>
+                <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'push',</Txt>
+                <Txt tab={1}>
+                  'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
+                  /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="environment" stateValues={[values, setValues]} />
+                  :$SHORT_SHA'
+                </Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
+
+            {isMigrationJobEnabled && (
+              <>
+                <Txt>- id: migration-job</Txt>
+                <Txt tab={0.5}>name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'</Txt>
+                <Txt tab={0.5}>entrypoint: gcloud</Txt>
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>
+                  'run', 'jobs', 'deploy', '<DynamicInput field="appProjectName" stateValues={[values, setValues]} />-<DynamicInput field="applicationName" stateValues={[values, setValues]} />-<DynamicInput field="environment" stateValues={[values, setValues]} />', '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />/<DynamicInput field="appProjectName" stateValues={[values, setValues]} />-<DynamicInput field="applicationName" stateValues={[values, setValues]} />-<DynamicInput field="environment" stateValues={[values, setValues]} />:$SHORT_SHA', '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--command', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]} />'
+                </Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
 
 
-
-            <Txt>- id: deploy-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
-            <Txt tab={0.5}>entrypoint: gcloud</Txt>
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'run', 'deploy',</Txt>
-            <Txt tab={1}>
-              '<DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="environment" stateValues={[values, setValues]}/>', 
-              '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
-              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
-              -
-              <DynamicInput field="environment" stateValues={[values, setValues]}/>
-              :$SHORT_SHA',
-            </Txt>
-            <Txt tab={1}>
-              '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'</Txt>
-            <Txt tab={0.5}>]</Txt>
-
-
-            </p>
-
-          </div>
+            {isDeployImageEnabled && (
+              <>
+                <Txt>- id: deploy-image</Txt>
+                <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+                <Txt tab={0.5}>entrypoint: gcloud</Txt>
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'run', 'deploy',</Txt>
+                <Txt tab={1}>
+                  '<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="environment" stateValues={[values, setValues]} />', 
+                  '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
+                  /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="environment" stateValues={[values, setValues]} />
+                  :$SHORT_SHA',
+                </Txt>
+                <Txt tab={1}>
+                  '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
+                </Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
+          </p>
         </div>
 
-      <ToastContainer
-        position="bottom-left"
-        autoClose={2500}
-        hideProgressBar
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable={false}
-        pauseOnHover={false}
-        theme="dark"
-      />
+        <ToastContainer
+          position="bottom-left"
+          autoClose={2500}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable={false}
+          pauseOnHover={false}
+          theme="dark"
+        />
+      </div>
     </div>
   );
 };

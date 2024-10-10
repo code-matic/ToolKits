@@ -1,0 +1,18 @@
+/* Positioning and styling of the tooltip */
+.custom-tooltip {
+    position: absolute;
+    background-color: #2563EB; /* Blue background */
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 1.1rem; /* Bigger font */
+    white-space: nowrap;
+    z-index: 10;
+    transform: translateY(-100%); /* Move above the input */
+  }
+  
+  /* Add some hover styling to input for better UX */
+  input[data-tooltip]:hover {
+    border-color: #1E3A8A;
+  }
+  

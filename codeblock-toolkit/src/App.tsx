@@ -19,7 +19,6 @@ function App() {
     environment: 'ENVIRONMENT',
     appProjectName: 'APP_PROJECT_NAME',
     projectId: 'PROJECT_ID',
-    dockerFilePath: 'DOCKER_FILE_PATH',
   });
 
   const [backendValues, setBackendValues] = useState({
@@ -29,7 +28,6 @@ function App() {
     appProjectName: 'APP_PROJECT_NAME',
     projectId: 'PROJECT_ID',
     envBucketUrl: 'ENV_BUCKET_URL',
-    dockerFilePath: 'DOCKER_FILE_PATH',
     migrationScriptPath: 'MIGRATION_SCRIPT_PATH',
   });
 

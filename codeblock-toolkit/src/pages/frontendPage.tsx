@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Txt from '../components/DynamicText';
 import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,7 +12,6 @@ interface FrontendPageProps {
     environment: string;
     appProjectName: string;
     projectId: string;
-    dockerFilePath: string;
   };
   setValues: React.Dispatch<React.SetStateAction<{
     envBucketUrl: string;
@@ -21,12 +20,17 @@ interface FrontendPageProps {
     environment: string;
     appProjectName: string;
     projectId: string;
-    dockerFilePath: string;
   }>>;
 }
 
 const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // State for toggling each step
+  const [isPullEnvEnabled, setPullEnvEnabled] = useState(true);
+  const [isBuildImageEnabled, setBuildImageEnabled] = useState(true);
+  const [isPushImageEnabled, setPushImageEnabled] = useState(true);
+  const [isDeployImageEnabled, setDeployImageEnabled] = useState(true);
 
   const handleCopyAllClick = () => {
     if (containerRef.current) {
@@ -100,61 +104,98 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
           </div>
         </div>
 
+        {/* Toggle Switches */}
+        <div style={{ padding: '20px' }}>
+          <label>
+            <input type="checkbox" checked={isPullEnvEnabled} onChange={() => setPullEnvEnabled(!isPullEnvEnabled)} />
+            Include Pull Env Step
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" checked={isBuildImageEnabled} onChange={() => setBuildImageEnabled(!isBuildImageEnabled)} />
+            Include Build Image Step
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" checked={isPushImageEnabled} onChange={() => setPushImageEnabled(!isPushImageEnabled)} />
+            Include Push Image Step
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" checked={isDeployImageEnabled} onChange={() => setDeployImageEnabled(!isDeployImageEnabled)} />
+            Include Deploy Image Step
+          </label>
+        </div>
+
         {/* Gray Box with Padding for Code Block */}
-        <div ref={containerRef} style={{ padding: '20px' }}>  {/* Retain padding for the actual code block */}
+        <div ref={containerRef} style={{ padding: '20px' }}>
           <p className="mb-4">
             <Txt>steps: </Txt>
-            <Txt>- id: pull-env</Txt>
-            <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt> 
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'cp', 'gs://
-            <DynamicInput field="envBucketUrl" stateValues={[values, setValues]} />
-            /.env', './<DynamicInput field="applicationName" stateValues={[values, setValues]} />/.env']</Txt>
 
-            <Txt>- id: build-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
-              /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
-              -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
-              -<DynamicInput field="environment" stateValues={[values, setValues]} />
-              :$SHORT_SHA', '-f', './<DynamicInput field="dockerFilePath" stateValues={[values, setValues]} />
-              Dockerfile', './'
-            </Txt>
-            <Txt tab={0.5}>]</Txt>
+            {isPullEnvEnabled && (
+              <>
+                <Txt>- id: pull-env</Txt>
+                <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt> 
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'cp', 'gs://<DynamicInput field="envBucketUrl" stateValues={[values, setValues]} />/.env', './<DynamicInput field="applicationName" stateValues={[values, setValues]} />/.env']</Txt>
+              </>
+            )}
 
-            <Txt>- id: push-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'push',</Txt>
-            <Txt tab={1}>
-              'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
-              /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
-              -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
-              -<DynamicInput field="environment" stateValues={[values, setValues]} />
-              :$SHORT_SHA'
-            </Txt>
-            <Txt tab={0.5}>]</Txt>
+            {isBuildImageEnabled && (
+              <>
+                <Txt>- id: build-image</Txt>
+                <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
+                  /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="environment" stateValues={[values, setValues]} />
+                  :$SHORT_SHA', '-f', './Dockerfile', './'
+                </Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
 
-            <Txt>- id: deploy-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
-            <Txt tab={0.5}>entrypoint: gcloud</Txt>
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'run', 'deploy',</Txt>
-            <Txt tab={1}>
-              '<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
-              -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
-              -<DynamicInput field="environment" stateValues={[values, setValues]} />', 
-              '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
-              /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
-              -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
-              -<DynamicInput field="environment" stateValues={[values, setValues]} />
-              :$SHORT_SHA',
-            </Txt>
-            <Txt tab={1}>
-              '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
-            </Txt>
-            <Txt tab={0.5}>]</Txt>
+            {isPushImageEnabled && (
+              <>
+                <Txt>- id: push-image</Txt>
+                <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'push',</Txt>
+                <Txt tab={1}>
+                  'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
+                  /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="environment" stateValues={[values, setValues]} />
+                  :$SHORT_SHA'
+                </Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
+
+            {isDeployImageEnabled && (
+              <>
+                <Txt>- id: deploy-image</Txt>
+                <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+                <Txt tab={0.5}>entrypoint: gcloud</Txt>
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'run', 'deploy',</Txt>
+                <Txt tab={1}>
+                  '<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="environment" stateValues={[values, setValues]} />', 
+                  '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
+                  /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
+                  -<DynamicInput field="environment" stateValues={[values, setValues]} />
+                  :$SHORT_SHA',
+                </Txt>
+                <Txt tab={1}>
+                  '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
+                </Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
           </p>
         </div>
 
