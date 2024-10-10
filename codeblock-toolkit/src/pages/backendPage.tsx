@@ -12,6 +12,7 @@ interface BackendPageProps {
     environment: string;
     appProjectName: string;
     projectId: string;
+    dockerFilePath: string;
     migrationScriptPath: string;
   };
   setValues: React.Dispatch<React.SetStateAction<{
@@ -21,6 +22,7 @@ interface BackendPageProps {
     environment: string;
     appProjectName: string;
     projectId: string;
+    dockerFilePath: string;
     migrationScriptPath: string;
   }>>;
 }
@@ -158,7 +160,7 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
                   /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
                   -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
                   -<DynamicInput field="environment" stateValues={[values, setValues]} />
-                  :$SHORT_SHA', '-f', './Dockerfile', './'
+                  :$SHORT_SHA', '-f', '<DynamicInput field="dockerFilePath" stateValues={[values, setValues]} />', './'
                 </Txt>
                 <Txt tab={0.5}>]</Txt>
               </>

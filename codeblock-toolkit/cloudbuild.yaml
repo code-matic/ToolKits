@@ -20,5 +20,5 @@ steps:
   args: [
     'run', 'deploy',
     'cloudbuild-generator-dev', '--image', 'eu.gcr.io/codematic-shared-environment/cloudbuild-generator-dev:$SHORT_SHA',
-    '--region', 'REGION', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
+    '--region', 'europe-west1', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
   ]

@@ -84,6 +84,10 @@ const UserGuidePage = () => {
         </li>
         <li className="relative pl-6">
           <span className="absolute left-0 top-0">›</span>
+          <strong>dockerFilePath</strong>: Replace with the path to your Dockerfile. (e.g., <code>./codeblock-toolkit/Dockerfile</code>, <code>./Dockerfile</code>)
+        </li>
+        <li className="relative pl-6">
+          <span className="absolute left-0 top-0">›</span>
           <strong>region</strong>: Replace with the region where your resources are deployed (e.g., <code>europe-west1</code>).
         </li>
         <li className="relative pl-6">
