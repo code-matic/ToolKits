@@ -15,7 +15,7 @@ function App() {
     environment: 'ENVIRONMENT',
     appProjectName: 'APP_PROJECT_NAME',
     projectId: 'PROJECT_ID',
-    dockerFilePath: 'DOCKER_FILE_PATH', 
+    dockerFilePath: 'DOCKER_FILE_PATH',
     envBucketUrl: '',
     migrationScriptPath: '',
   });
@@ -24,7 +24,6 @@ function App() {
   useEffect(() => {
     setValues(prevValues => ({
       ...prevValues,
-      dockerFilePath: appType === 'backend' ? 'DOCKER_FILE_PATH' : '', // Only for backend
       envBucketUrl: usesEnvVars ? 'ENV_BUCKET_URL' : '', // Only if using env vars
       migrationScriptPath: appType === 'backend' && runsMigrations ? 'MIGRATION_SCRIPT_PATH' : '', // Only for backend if migrations are used
     }));
@@ -32,6 +31,10 @@ function App() {
 
   const handleNextStep = () => {
     setCurrentStep(currentStep + 1);
+  };
+
+  const handlePreviousStep = () => {
+    setCurrentStep(currentStep - 1);
   };
 
   // Render different questions based on the current step
@@ -130,6 +133,16 @@ function App() {
       <header className="text-center bg-white py-4">
         <h1 className="text-5xl font-bold text-[#2563EB]">CLOUDBUILD GENERATOR</h1>
       </header>
+
+      {/* Back Button at the top left */}
+      {currentStep > 0 && (
+        <button
+          className="absolute top-30 left-4 px-4 py-2 bg-[#2563EB] text-white rounded-md"
+          onClick={handlePreviousStep}
+        >
+          Back
+        </button>
+      )}
 
       <div className="max-w-screen-lg mx-auto mt-5 h-full rounded-lg p-4">
         {renderStep()} {/* This renders the current question or the configurator */}
