@@ -11,9 +11,9 @@ interface ConfigPageProps {
     environment: string;
     appProjectName: string;
     projectId: string;
-    envBucketUrl?: string; // Optional for frontend
-    dockerFilePath?: string; // Optional for frontend
-    migrationScriptPath?: string; // Optional for backend
+    envBucketUrl: string; // Optional for frontend
+    dockerFilePath: string; // Optional for frontend
+    migrationScriptPath: string; // Optional for backend
   };
   setValues: React.Dispatch<React.SetStateAction<ConfigPageProps['values']>>;
   usesEnvVars: boolean | null; // Prop for environment variable usage

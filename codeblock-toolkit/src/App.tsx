@@ -4,8 +4,8 @@ import DynamicValuesEditor from './components/DynamicValuesEditor'; // Import yo
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [appType, setAppType] = useState<'frontend' | 'backend' | ''>(''); // Updated type to include the specific types
-  const [usesEnvVars, setUsesEnvVars] = useState<null | boolean>(null); // Track environment variable usage
+  const [appType, setAppType] = useState<'frontend' | 'backend' | null>(null); // Allow null for initial state
+  const [usesEnvVars, setUsesEnvVars] = useState<boolean>(false); // Track environment variable usage
   const [runsMigrations, setRunsMigrations] = useState(false);
 
   // Configurator values for frontend and backend
@@ -15,19 +15,20 @@ function App() {
     environment: 'ENVIRONMENT',
     appProjectName: 'APP_PROJECT_NAME',
     projectId: 'PROJECT_ID',
-    dockerFilePath: 'DOCKERFILE_PATH', // Set to undefined initially
-    envBucketUrl: 'ENV_BUCKET_URL',
-    migrationScriptPath: 'MIGRATION_SCRIPT_PATH',
+    dockerFilePath: 'DOCKER_FILE_PATH', 
+    envBucketUrl: '',
+    migrationScriptPath: '',
   });
 
   // Update values based on user selections
-  // useEffect(() => {
-  //   setValues(prevValues => ({
-  //     ...prevValues,
-  //     envBucketUrl: usesEnvVars ? 'ENV_BUCKET_URL' : undefined,
-  //     migrationScriptPath: appType === 'backend' && runsMigrations ? 'MIGRATION_SCRIPT_PATH' : undefined,
-  //   }));
-  // }, [appType, usesEnvVars, runsMigrations]);
+  useEffect(() => {
+    setValues(prevValues => ({
+      ...prevValues,
+      dockerFilePath: appType === 'backend' ? 'DOCKER_FILE_PATH' : '', // Only for backend
+      envBucketUrl: usesEnvVars ? 'ENV_BUCKET_URL' : '', // Only if using env vars
+      migrationScriptPath: appType === 'backend' && runsMigrations ? 'MIGRATION_SCRIPT_PATH' : '', // Only for backend if migrations are used
+    }));
+  }, [appType, usesEnvVars, runsMigrations]);
 
   const handleNextStep = () => {
     setCurrentStep(currentStep + 1);
@@ -109,7 +110,7 @@ function App() {
         <DynamicValuesEditor
           values={values}
           setValues={setValues}
-          configType={appType} // Pass the appType for DynamicValuesEditor
+          configType={appType || 'frontend'} // Use a default value
           usesEnvVars={usesEnvVars} // Pass the usesEnvVars state
           runsMigrations={runsMigrations} // Pass the runsMigrations state
         />
@@ -118,7 +119,7 @@ function App() {
           setValues={setValues}
           usesEnvVars={usesEnvVars}
           runsMigrations={runsMigrations}
-          appType={appType} // Pass the appType to ConfigPage
+          appType={appType || 'frontend'} // Use a default value
         />
       </>
     );
