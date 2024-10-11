@@ -30,12 +30,9 @@ interface BackendPageProps {
 const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // State for toggling each step
-  const [isPullEnvEnabled, setPullEnvEnabled] = useState(true);
-  const [isBuildImageEnabled, setBuildImageEnabled] = useState(true);
-  const [isPushImageEnabled, setPushImageEnabled] = useState(true);
-  const [isMigrationJobEnabled, setMigrationJobEnabled] = useState(true);
-  const [isDeployImageEnabled, setDeployImageEnabled] = useState(true);
+  // Questions
+  const [usesEnvVars, setUsesEnvVars] = useState<null | boolean>(null); // Tracks whether environment variables are used
+  const [runsMigrations, setRunsMigrations] = useState<null | boolean>(null); // Tracks whether migrations are needed
 
   const handleCopyAllClick = () => {
     if (containerRef.current) {
@@ -58,6 +55,9 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
     }
   };
 
+
+
+
   return (
     <div
       style={{
@@ -76,6 +76,53 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
           overflowX: 'auto',
         }}
       >
+
+
+        <div style={{ padding: '20px' }}>
+          <h4>Are you using environment variables in your application?</h4>
+          <label>
+            <input
+              type="radio"
+              name="envVariables"
+              value="yes"
+              onChange={() => setUsesEnvVars(true)}
+            />
+            Yes
+          </label>
+          <label style={{ marginLeft: '20px' }}>
+            <input
+              type="radio"
+              name="envVariables"
+              value="no"
+              onChange={() => setUsesEnvVars(false)}
+            />
+            No
+          </label>
+
+          <h4>Are you running any migration in your application?</h4>
+          <label>
+            <input
+              type="radio"
+              name="migrationVariables"
+              value="yes"
+              onChange={() => setRunsMigrations(true)}
+            />
+            Yes
+          </label>
+          <label style={{ marginLeft: '20px' }}>
+            <input
+              type="radio"
+              name="migrationVariables"
+              value="no"
+              onChange={() => setRunsMigrations(false)}
+            />
+            No
+          </label>
+        </div>
+
+        {/* Conditionally render the rest based on the user's choice */}
+        {usesEnvVars !== null && runsMigrations !==null && (
+          <>
 
         {/* Your Output Banner and Copy Button */}
         <div className="w-full flex justify-between items-center bg-[#2563EB] text-white p-4 mb-4" 
@@ -109,40 +156,13 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
           </div>
         </div>
 
-        {/* Toggle Switches */}
-        <div style={{ padding: '20px' }}>
-          <label>
-            <input type="checkbox" checked={isPullEnvEnabled} onChange={() => setPullEnvEnabled(!isPullEnvEnabled)} />
-            Include Pull Env Step
-          </label>
-          <br />
-          <label>
-            <input type="checkbox" checked={isBuildImageEnabled} onChange={() => setBuildImageEnabled(!isBuildImageEnabled)} />
-            Include Build Image Step
-          </label>
-          <br />
-          <label>
-            <input type="checkbox" checked={isPushImageEnabled} onChange={() => setPushImageEnabled(!isPushImageEnabled)} />
-            Include Push Image Step
-          </label>
-          <br />
-          <label>
-            <input type="checkbox" checked={isMigrationJobEnabled} onChange={() => setMigrationJobEnabled(!isMigrationJobEnabled)} />
-            Include Migration Job Step
-          </label>
-          <br />
-          <label>
-            <input type="checkbox" checked={isDeployImageEnabled} onChange={() => setDeployImageEnabled(!isDeployImageEnabled)} />
-            Include Deploy Image Step
-          </label>
-        </div>
 
         {/* Gray Box with Padding for Code Block */}
         <div ref={containerRef} style={{ padding: '20px' }}>
           <p className="mb-4">
             <Txt>steps: </Txt>
 
-            {isPullEnvEnabled && (
+            {usesEnvVars && (
               <>
                 <Txt>- id: pull-env</Txt>
                 <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt> 
@@ -151,8 +171,6 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
               </>
             )}
 
-            {isBuildImageEnabled && (
-              <>
                 <Txt>- id: build-image</Txt>
                 <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
                 <Txt tab={0.5}>args: [</Txt>
@@ -163,11 +181,7 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
                   :$SHORT_SHA', '-f', '<DynamicInput field="dockerFilePath" stateValues={[values, setValues]} />', './'
                 </Txt>
                 <Txt tab={0.5}>]</Txt>
-              </>
-            )}
 
-            {isPushImageEnabled && (
-              <>
                 <Txt>- id: push-image</Txt>
                 <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
                 <Txt tab={0.5}>args: [</Txt>
@@ -180,25 +194,15 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
                   :$SHORT_SHA'
                 </Txt>
                 <Txt tab={0.5}>]</Txt>
-              </>
-            )}
 
-            {isMigrationJobEnabled && (
+            {runsMigrations && (
               <>
                 <Txt>- id: migration-job</Txt>
-                <Txt tab={0.5}>name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'</Txt>
-                <Txt tab={0.5}>entrypoint: gcloud</Txt>
-                <Txt tab={0.5}>args: [</Txt>
-                <Txt tab={1}>
-                  'run', 'jobs', 'deploy', '<DynamicInput field="appProjectName" stateValues={[values, setValues]} />-<DynamicInput field="applicationName" stateValues={[values, setValues]} />-<DynamicInput field="environment" stateValues={[values, setValues]} />', '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />/<DynamicInput field="appProjectName" stateValues={[values, setValues]} />-<DynamicInput field="applicationName" stateValues={[values, setValues]} />-<DynamicInput field="environment" stateValues={[values, setValues]} />:$SHORT_SHA', '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--command', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]} />'
-                </Txt>
-                <Txt tab={0.5}>]</Txt>
+                <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gcloud'</Txt> 
+                <Txt tab={0.5}>args: ['run', 'jobs', 'execute', 'migration-job', '--project', '<DynamicInput field="projectId" stateValues={[values, setValues]} />', '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />']</Txt>
               </>
             )}
 
-
-            {isDeployImageEnabled && (
-              <>
                 <Txt>- id: deploy-image</Txt>
                 <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
                 <Txt tab={0.5}>entrypoint: gcloud</Txt>
@@ -218,23 +222,12 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues }) => {
                   '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
                 </Txt>
                 <Txt tab={0.5}>]</Txt>
-              </>
-            )}
-          </p>
-        </div>
+            </p>
+          </div>
 
-        <ToastContainer
-          position="bottom-left"
-          autoClose={2500}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable={false}
-          pauseOnHover={false}
-          theme="dark"
-        />
+        <ToastContainer />
+        </>
+        )}
       </div>
     </div>
   );
