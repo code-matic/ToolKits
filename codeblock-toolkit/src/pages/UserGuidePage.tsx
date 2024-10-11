@@ -1,4 +1,8 @@
-const UserGuidePage = () => {
+interface UserGuidePageProps {
+  onBack: () => void;
+}
+
+const UserGuidePage: React.FC<UserGuidePageProps> = ({ onBack }) => {
   return (
     <div className="user-guide p-4 mb-6 rounded-lg bg-[#FFFFFF]">
       <h2 className="text-lg font-bold mb-3">User Guide</h2>
@@ -95,6 +99,14 @@ const UserGuidePage = () => {
           <strong>environment</strong>: Replace with the environment type (e.g., <code>development</code>, <code>production</code>).
         </li>
       </ul>
+
+
+      <button
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+        onClick={onBack}
+      >
+        Back to Configurator
+      </button>
     </div>
   );
 };

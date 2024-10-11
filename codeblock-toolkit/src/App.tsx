@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
-import ConfigPage from './pages/ConfigPage'; // Import the new ConfigPage component
-import DynamicValuesEditor from './components/DynamicValuesEditor'; // Import your DynamicValuesEditor component
-import FeedbackForm from './pages/FeedbackPage'; // Import your FeedbackForm component
+import ConfigPage from './pages/ConfigPage';
+import DynamicValuesEditor from './components/DynamicValuesEditor';
+import FeedbackForm from './pages/FeedbackPage';
 import { SiChatbot } from 'react-icons/si';
+import UserGuidePage from './pages/UserGuidePage';
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [appType, setAppType] = useState<'frontend' | 'backend' | null>(null); // Allow null for initial state
-  const [usesEnvVars, setUsesEnvVars] = useState<boolean>(false); // Track environment variable usage
+  const [appType, setAppType] = useState<'frontend' | 'backend' | null>(null);
+  const [usesEnvVars, setUsesEnvVars] = useState<boolean>(false);
   const [runsMigrations, setRunsMigrations] = useState(false);
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false); // State for feedback form visibility
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [showUserGuide, setShowUserGuide] = useState(false); // State to toggle User Guide visibility
 
-  // Configurator values for frontend and backend
   const [values, setValues] = useState({
     applicationName: 'APPLICATION_NAME',
     region: 'REGION',
@@ -23,12 +24,11 @@ function App() {
     migrationScriptPath: '',
   });
 
-  // Update values based on user selections
   useEffect(() => {
     setValues(prevValues => ({
       ...prevValues,
-      envBucketUrl: usesEnvVars ? 'ENV_BUCKET_URL' : '', // Only if using env vars
-      migrationScriptPath: appType === 'backend' && runsMigrations ? 'MIGRATION_SCRIPT_PATH' : '', // Only for backend if migrations are used
+      envBucketUrl: usesEnvVars ? 'ENV_BUCKET_URL' : '',
+      migrationScriptPath: appType === 'backend' && runsMigrations ? 'MIGRATION_SCRIPT_PATH' : '',
     }));
   }, [appType, usesEnvVars, runsMigrations]);
 
@@ -40,7 +40,6 @@ function App() {
     setCurrentStep(currentStep - 1);
   };
 
-  // Render different questions based on the current step
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -84,7 +83,6 @@ function App() {
           </div>
         );
       case 2:
-        // Only ask the migration question if it's a backend app
         return appType === 'backend' ? (
           <div className="flex flex-col items-center justify-center">
             <h2 className="text-xl mb-6">Are you using a migration step?</h2>
@@ -112,21 +110,45 @@ function App() {
   const renderConfigurator = () => {
     return (
       <>
-        {/* Include Dynamic Values Editor for both Frontend and Backend */}
-        <DynamicValuesEditor
-          values={values}
-          setValues={setValues}
-          configType={appType || 'frontend'} // Use a default value
-          usesEnvVars={usesEnvVars} // Pass the usesEnvVars state
-          runsMigrations={runsMigrations} // Pass the runsMigrations state
-        />
-        <ConfigPage
-          values={values}
-          setValues={setValues}
-          usesEnvVars={usesEnvVars}
-          runsMigrations={runsMigrations}
-          appType={appType || 'frontend'} // Use a default value
-        />
+        {!showUserGuide && (
+          <>
+            <DynamicValuesEditor
+              values={values}
+              setValues={setValues}
+              configType={appType || 'frontend'}
+              usesEnvVars={usesEnvVars}
+              runsMigrations={runsMigrations}
+            />
+
+            {/* Instructional text with the link to show User Guide */}
+            <div className="text-center mt-6">
+              <p className="text-lg">
+                Want to learn more about the different dynamic values and how to derive them?
+                <button
+                  onClick={() => setShowUserGuide(true)}
+                  className="text-blue-500 underline ml-2"
+                >
+                  Click here
+                </button>
+              </p>
+            </div>
+
+            <ConfigPage
+              values={values}
+              setValues={setValues}
+              usesEnvVars={usesEnvVars}
+              runsMigrations={runsMigrations}
+              appType={appType || 'frontend'}
+            />
+          </>
+        )}
+
+        {/* Conditionally render the UserGuidePage */}
+        {showUserGuide && (
+          <UserGuidePage
+            onBack={() => setShowUserGuide(false)} // Pass a back handler to hide the user guide
+          />
+        )}
       </>
     );
   };
@@ -137,32 +159,35 @@ function App() {
         <h1 className="text-5xl font-bold text-[#2563EB]">CLOUDBUILD GENERATOR</h1>
       </header>
 
-      {/* Back Button at the top left */}
+      {/* Only show the back button if currentStep is greater than 0 */}
       {currentStep > 0 && (
         <button
           className="absolute top-16 left-6 md:left-8 lg:left-12 px-6 py-2 bg-[#2563EB] text-white rounded-md"
-          onClick={handlePreviousStep}
+          onClick={() => {
+            if (showUserGuide) {
+              setShowUserGuide(false); // Go back from user guide
+            } else {
+              handlePreviousStep(); // Go back in the step flow
+            }
+          }}
         >
           Back
         </button>
       )}
 
-      {/* Centering the content */}
       <div className="flex flex-grow items-center justify-center">
         <div className="max-w-screen-lg w-full p-4">
-          {renderStep()} {/* This renders the current question or the configurator */}
+          {renderStep()}
         </div>
       </div>
 
-      {/* Feedback Button */}
       <button
         onClick={() => setShowFeedbackForm(true)}
         className="fixed bottom-8 right-5 px-6 py-3 bg-[#2563EB] text-white rounded-full hover:bg-[#1D4ED8] flex items-center space-x-2"
       >
-        <SiChatbot className="text-white text-4xl" /> {/* Feedback Icon */}
+        <SiChatbot className="text-white text-4xl" />
       </button>
 
-      {/* Feedback Form Modal */}
       {showFeedbackForm && (
         <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 w-[90%] max-w-md">
           <FeedbackForm onClose={() => setShowFeedbackForm(false)} />

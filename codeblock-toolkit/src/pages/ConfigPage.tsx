@@ -118,16 +118,46 @@ const ConfigPage: React.FC<ConfigPageProps> = ({ values, setValues, usesEnvVars,
             <Txt tab={0.5}>]</Txt>
 
             <Txt>- id: push-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt>
+            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
             <Txt tab={0.5}>args: [</Txt>
+            <Txt tab={1}>'push',</Txt>
             <Txt tab={1}>
-              'push', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
-              /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
-              -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
-              -<DynamicInput field="environment" stateValues={[values, setValues]} />
+              'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>
               :$SHORT_SHA'
             </Txt>
             <Txt tab={0.5}>]</Txt>
+
+            {runsMigrations && appType === 'backend' && (
+              <>
+                <Txt>- id: migration-job</Txt>
+                <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+                <Txt tab={0.5}>entrypoint: gcloud</Txt>
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'run', 'jobs', 'deploy',</Txt>
+                <Txt tab={1}>
+                  '<DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+                  -
+                  <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+                  -
+                  <DynamicInput field="environment" stateValues={[values, setValues]}/>', 
+                  '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+                  <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+                  -
+                  <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+                  -
+                  <DynamicInput field="environment" stateValues={[values, setValues]}/>
+                  :$SHORT_SHA',
+                </Txt>
+                <Txt tab={1}>
+                  '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--command', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]}/>'</Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
 
             <Txt>- id: deploy-image</Txt>
             <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
@@ -148,21 +178,6 @@ const ConfigPage: React.FC<ConfigPageProps> = ({ values, setValues, usesEnvVars,
               '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
             </Txt>
             <Txt tab={0.5}>]</Txt>
-
-            {runsMigrations && appType === 'backend' && (
-              <>
-                <Txt>- id: run-migration</Txt>
-                <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt>
-                <Txt tab={0.5}>entrypoint: gcloud</Txt>
-                <Txt tab={0.5}>args: [</Txt>
-                <Txt tab={1}>'sql', 'migrations', 'run', '--project', '<DynamicInput field="projectId" stateValues={[values, setValues]} />',</Txt>
-                <Txt tab={1}>
-                  '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', 
-                  '--source', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]} />'
-                </Txt>
-                <Txt tab={0.5}>]</Txt>
-              </>
-            )}
           </p>
         </div>
 
