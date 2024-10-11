@@ -4,32 +4,24 @@ import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-interface BackendPageProps {
+interface ConfigPageProps {
   values: {
     applicationName: string;
     region: string;
     environment: string;
     appProjectName: string;
     projectId: string;
-    envBucketUrl: string;
-    dockerFilePath: string;
-    migrationScriptPath: string;
+    envBucketUrl?: string; // Optional for frontend
+    dockerFilePath?: string; // Optional for frontend
+    migrationScriptPath?: string; // Optional for backend
   };
-  setValues: React.Dispatch<React.SetStateAction<{
-    applicationName: string;
-    region: string;
-    environment: string;
-    appProjectName: string;
-    projectId: string;
-    envBucketUrl: string;
-    dockerFilePath: string;
-    migrationScriptPath: string;
-  }>>;
+  setValues: React.Dispatch<React.SetStateAction<ConfigPageProps['values']>>;
   usesEnvVars: boolean | null; // Prop for environment variable usage
   runsMigrations: boolean; // Prop to check if migrations are needed
+  appType: 'frontend' | 'backend'; // App type to distinguish between frontend and backend
 }
 
-const BackendPage: React.FC<BackendPageProps> = ({ values, setValues, usesEnvVars, runsMigrations }) => {
+const ConfigPage: React.FC<ConfigPageProps> = ({ values, setValues, usesEnvVars, runsMigrations, appType }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleCopyAllClick = () => {
@@ -157,7 +149,7 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues, usesEnvVar
             </Txt>
             <Txt tab={0.5}>]</Txt>
 
-            {runsMigrations && (
+            {runsMigrations && appType === 'backend' && (
               <>
                 <Txt>- id: run-migration</Txt>
                 <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt>
@@ -180,4 +172,4 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues, usesEnvVar
   );
 };
 
-export default BackendPage;
+export default ConfigPage;

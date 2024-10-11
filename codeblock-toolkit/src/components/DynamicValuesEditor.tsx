@@ -7,9 +7,11 @@ interface DynamicValuesProps {
   };
   setValues: React.Dispatch<React.SetStateAction<any>>;
   configType: 'frontend' | 'backend'; // To distinguish between frontend and backend
+  usesEnvVars: boolean; // New prop to indicate pull-env selection
+  runsMigrations: boolean; // New prop to indicate migration-job selection
 }
 
-const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, configType }) => {
+const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, configType, usesEnvVars, runsMigrations }) => {
   const [hoveredField, setHoveredField] = useState<string | null>(null); // To track hovered field
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,23 +22,29 @@ const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, 
     }));
   };
 
-  // Define fields for frontend and backend separately
-  const frontendFields = ['dockerFilePath', 'projectId', 'appProjectName', 'applicationName', 'region', 'environment', 'envBucketUrl'];
-  const backendFields = ['dockerFilePath', 'projectId', 'appProjectName', 'applicationName', 'region', 'environment', 'envBucketUrl', 'migrationScriptPath'];
-
-  // Dynamically choose fields based on configType
-  const fieldsToDisplay = configType === 'frontend' ? frontendFields : backendFields;
+  // Define fields for frontend and backend separately, using conditions
+  const fieldsToDisplay = [
+    'projectId',
+    'appProjectName',
+    'applicationName',
+    'region',
+    'environment',
+    'dockerFilePath',
+    ...(configType === 'frontend' && usesEnvVars ? ['envBucketUrl'] : []), // Show dockerFilePath if using env vars for frontend
+    ...(configType === 'backend' && usesEnvVars ? ['envBucketUrl'] : []), // Show dockerFilePath if using env vars for backend
+    ...(configType === 'backend' && runsMigrations ? ['migrationScriptPath'] : []), // Show migrationScriptPath if running migrations for backend
+  ];
 
   // Sample values for tooltips
   const sampleValues: { [key: string]: string } = {
-    envBucketUrl: 'envs_store_dev/parentyn/backend',
-    migrationScriptPath: './migrate.sh',
-    projectId: 'codematic-shared-environment',
-    appProjectName: 'parentyn',
-    applicationName: 'frontend',
-    region: 'europe-west1',
-    dockerFilePath: './codeblock-toolkit/Dockerfile',
-    environment: 'development',
+    envBucketUrl: 'Eg. envs_store_dev/parentyn/backend',
+    migrationScriptPath: 'Eg. ./migrate.sh',
+    projectId: 'Eg. codematic-shared-environment',
+    appProjectName: 'Eg. parentyn',
+    applicationName: 'Eg. frontend',
+    region: 'Eg. europe-west1',
+    dockerFilePath: 'Eg. ./codeblock-toolkit/Dockerfile',
+    environment: 'Eg. development',
   };
 
   return (
@@ -52,7 +60,7 @@ const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, 
               type="text"
               id={key}
               name={key}
-              value={values[key as keyof typeof values]} 
+              value={values[key as keyof typeof values]}
               onChange={handleChange}
               onMouseEnter={() => setHoveredField(key)} // Track hovered field
               onMouseLeave={() => setHoveredField(null)} // Reset on leave
