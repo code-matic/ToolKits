@@ -6,12 +6,11 @@ import { SiChatbot } from 'react-icons/si';
 import UserGuidePage from './pages/UserGuidePage';
 
 function App() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(-1); // Start at -1 for User Guide
   const [appType, setAppType] = useState<'frontend' | 'backend' | null>(null);
   const [usesEnvVars, setUsesEnvVars] = useState<boolean>(false);
   const [runsMigrations, setRunsMigrations] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-  const [showUserGuide, setShowUserGuide] = useState(false); // State to toggle User Guide visibility
 
   const [values, setValues] = useState({
     applicationName: 'APPLICATION_NAME',
@@ -40,8 +39,19 @@ function App() {
     setCurrentStep(currentStep - 1);
   };
 
+  const skipToConfigurator = () => {
+    setCurrentStep(0); // Go directly to the first question
+  };
+
   const renderStep = () => {
     switch (currentStep) {
+      case -1:
+        return (
+          <UserGuidePage
+            onBack={skipToConfigurator} // "Back to Configurator" button
+            onSkipToConfigurator={skipToConfigurator} // "Skip to Configurator" button
+          />
+        );
       case 0:
         return (
           <div className="flex flex-col items-center justify-center">
@@ -110,45 +120,33 @@ function App() {
   const renderConfigurator = () => {
     return (
       <>
-        {!showUserGuide && (
-          <>
-            <DynamicValuesEditor
-              values={values}
-              setValues={setValues}
-              configType={appType || 'frontend'}
-              usesEnvVars={usesEnvVars}
-              runsMigrations={runsMigrations}
-            />
+        <DynamicValuesEditor
+          values={values}
+          setValues={setValues}
+          configType={appType || 'frontend'}
+          usesEnvVars={usesEnvVars}
+          runsMigrations={runsMigrations}
+        />
 
-            {/* Instructional text with the link to show User Guide */}
-            <div className="text-center mt-6">
-              <p className="text-lg">
-                Want to learn more about the different dynamic values and how to derive them?
-                <button
-                  onClick={() => setShowUserGuide(true)}
-                  className="text-blue-500 underline ml-2"
-                >
-                  Click here
-                </button>
-              </p>
-            </div>
+        <div className="text-center mt-6">
+          <p className="text-lg">
+            Want to learn more about the different dynamic values and how to derive them?
+            <button
+              onClick={() => setCurrentStep(-1)}
+              className="text-blue-500 underline ml-2"
+            >
+              Click here
+            </button>
+          </p>
+        </div>
 
-            <ConfigPage
-              values={values}
-              setValues={setValues}
-              usesEnvVars={usesEnvVars}
-              runsMigrations={runsMigrations}
-              appType={appType || 'frontend'}
-            />
-          </>
-        )}
-
-        {/* Conditionally render the UserGuidePage */}
-        {showUserGuide && (
-          <UserGuidePage
-            onBack={() => setShowUserGuide(false)} // Pass a back handler to hide the user guide
-          />
-        )}
+        <ConfigPage
+          values={values}
+          setValues={setValues}
+          usesEnvVars={usesEnvVars}
+          runsMigrations={runsMigrations}
+          appType={appType || 'frontend'}
+        />
       </>
     );
   };
@@ -159,17 +157,10 @@ function App() {
         <h1 className="text-5xl font-bold text-[#2563EB]">CLOUDBUILD GENERATOR</h1>
       </header>
 
-      {/* Only show the back button if currentStep is greater than 0 */}
-      {currentStep > 0 && (
+      {currentStep >= 0 && (
         <button
           className="absolute top-16 left-6 md:left-8 lg:left-12 px-6 py-2 bg-[#2563EB] text-white rounded-md"
-          onClick={() => {
-            if (showUserGuide) {
-              setShowUserGuide(false); // Go back from user guide
-            } else {
-              handlePreviousStep(); // Go back in the step flow
-            }
-          }}
+          onClick={handlePreviousStep}
         >
           Back
         </button>

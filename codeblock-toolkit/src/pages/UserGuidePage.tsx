@@ -1,9 +1,20 @@
 interface UserGuidePageProps {
   onBack: () => void;
+  onSkipToConfigurator: () => void;
 }
 
-const UserGuidePage: React.FC<UserGuidePageProps> = ({ onBack }) => {
+const UserGuidePage: React.FC<UserGuidePageProps> = ({ onBack, onSkipToConfigurator }) => {
   return (
+    <div className="p-6">
+      {/* "Skip to Configurator" button at the top */}
+      <div className="flex justify-end">
+        <button
+          onClick={onSkipToConfigurator}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Skip to Configurator
+        </button>
+      </div>
     <div className="user-guide p-4 mb-6 rounded-lg bg-[#FFFFFF]">
       <h2 className="text-lg font-bold mb-3">User Guide</h2>
       <p>
@@ -105,8 +116,9 @@ const UserGuidePage: React.FC<UserGuidePageProps> = ({ onBack }) => {
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
         onClick={onBack}
       >
-        Back to Configurator
+        Proceed to Configurator
       </button>
+    </div>
     </div>
   );
 };
