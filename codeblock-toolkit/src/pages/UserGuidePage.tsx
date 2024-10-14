@@ -10,7 +10,7 @@ const UserGuidePage: React.FC<UserGuidePageProps> = ({ onBack, onSkipToConfigura
       <div className="flex justify-end">
         <button
           onClick={onSkipToConfigurator}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="px-8 py-3 bg-white text-[#2563EB] rounded-md hover:bg-[#2563EB1A] border-2 border-[#2563EB]"
         >
           Skip to Configurator
         </button>
@@ -113,7 +113,7 @@ const UserGuidePage: React.FC<UserGuidePageProps> = ({ onBack, onSkipToConfigura
 
 
       <button
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+        className="px-8 py-3 bg-[#2563EB] text-white rounded-md hover:bg-blue-700 border-2 border-[#2563EB] mb-10 mt-10"
         onClick={onBack}
       >
         Proceed to Configurator
