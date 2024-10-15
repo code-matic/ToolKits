@@ -140,6 +140,8 @@ function App() {
           </p>
         </div>
 
+        <button onClick={handleOAuthLogin}>Connect to GitHub</button>
+
         <ConfigPage
           values={values}
           setValues={setValues}
@@ -149,6 +151,15 @@ function App() {
         />
       </>
     );
+  };
+
+  const handleOAuthLogin = () => {
+    const clientId = 'YOUR_CLIENT_ID';
+    const redirectUri = 'YOUR_REDIRECT_URI'; // Same as the one in GitHub settings
+    const scope = 'repo'; // Scopes determine the level of access
+    const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+    
+    window.location.href = authUrl; // Redirect to GitHub
   };
 
   return (
