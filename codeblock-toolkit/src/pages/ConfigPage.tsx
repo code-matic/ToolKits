@@ -4,32 +4,24 @@ import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-interface BackendPageProps {
+interface ConfigPageProps {
   values: {
     applicationName: string;
     region: string;
     environment: string;
     appProjectName: string;
     projectId: string;
-    envBucketUrl: string;
-    dockerFilePath: string;
-    migrationScriptPath: string;
+    envBucketUrl: string; // Optional for frontend
+    dockerFilePath: string; // Optional for frontend
+    migrationScriptPath: string; // Optional for backend
   };
-  setValues: React.Dispatch<React.SetStateAction<{
-    applicationName: string;
-    region: string;
-    environment: string;
-    appProjectName: string;
-    projectId: string;
-    envBucketUrl: string;
-    dockerFilePath: string;
-    migrationScriptPath: string;
-  }>>;
+  setValues: React.Dispatch<React.SetStateAction<ConfigPageProps['values']>>;
   usesEnvVars: boolean | null; // Prop for environment variable usage
   runsMigrations: boolean; // Prop to check if migrations are needed
+  appType: 'frontend' | 'backend'; // App type to distinguish between frontend and backend
 }
 
-const BackendPage: React.FC<BackendPageProps> = ({ values, setValues, usesEnvVars, runsMigrations }) => {
+const ConfigPage: React.FC<ConfigPageProps> = ({ values, setValues, usesEnvVars, runsMigrations, appType }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleCopyAllClick = () => {
@@ -126,16 +118,46 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues, usesEnvVar
             <Txt tab={0.5}>]</Txt>
 
             <Txt>- id: push-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt>
+            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
             <Txt tab={0.5}>args: [</Txt>
+            <Txt tab={1}>'push',</Txt>
             <Txt tab={1}>
-              'push', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
-              /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
-              -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
-              -<DynamicInput field="environment" stateValues={[values, setValues]} />
+              'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+              <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+              -
+              <DynamicInput field="environment" stateValues={[values, setValues]}/>
               :$SHORT_SHA'
             </Txt>
             <Txt tab={0.5}>]</Txt>
+
+            {runsMigrations && appType === 'backend' && (
+              <>
+                <Txt>- id: migration-job</Txt>
+                <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+                <Txt tab={0.5}>entrypoint: gcloud</Txt>
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>'run', 'jobs', 'deploy',</Txt>
+                <Txt tab={1}>
+                  '<DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+                  -
+                  <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+                  -
+                  <DynamicInput field="environment" stateValues={[values, setValues]}/>', 
+                  '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]}/>/
+                  <DynamicInput field="appProjectName" stateValues={[values, setValues]}/>
+                  -
+                  <DynamicInput field="applicationName" stateValues={[values, setValues]}/>
+                  -
+                  <DynamicInput field="environment" stateValues={[values, setValues]}/>
+                  :$SHORT_SHA',
+                </Txt>
+                <Txt tab={1}>
+                  '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--command', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]}/>'</Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
 
             <Txt>- id: deploy-image</Txt>
             <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
@@ -156,21 +178,6 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues, usesEnvVar
               '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
             </Txt>
             <Txt tab={0.5}>]</Txt>
-
-            {runsMigrations && (
-              <>
-                <Txt>- id: run-migration</Txt>
-                <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt>
-                <Txt tab={0.5}>entrypoint: gcloud</Txt>
-                <Txt tab={0.5}>args: [</Txt>
-                <Txt tab={1}>'sql', 'migrations', 'run', '--project', '<DynamicInput field="projectId" stateValues={[values, setValues]} />',</Txt>
-                <Txt tab={1}>
-                  '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', 
-                  '--source', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]} />'
-                </Txt>
-                <Txt tab={0.5}>]</Txt>
-              </>
-            )}
           </p>
         </div>
 
@@ -180,4 +187,4 @@ const BackendPage: React.FC<BackendPageProps> = ({ values, setValues, usesEnvVar
   );
 };
 
-export default BackendPage;
+export default ConfigPage;

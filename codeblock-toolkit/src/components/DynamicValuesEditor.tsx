@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import './DynamicValuesEditor.css'; // Import your custom CSS for tooltips
 
 interface DynamicValuesProps {
   values: {
@@ -6,9 +7,13 @@ interface DynamicValuesProps {
   };
   setValues: React.Dispatch<React.SetStateAction<any>>;
   configType: 'frontend' | 'backend'; // To distinguish between frontend and backend
+  usesEnvVars: boolean; // New prop to indicate pull-env selection
+  runsMigrations: boolean; // New prop to indicate migration-job selection
 }
 
-const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, configType }) => {
+const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, configType, usesEnvVars, runsMigrations }) => {
+  const [hoveredField, setHoveredField] = useState<string | null>(null); // To track hovered field
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setValues((prevValues: any) => ({
@@ -17,12 +22,30 @@ const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, 
     }));
   };
 
-  // Define fields for frontend and backend separately
-  const frontendFields = ['dockerFilePath', 'projectId', 'appProjectName', 'applicationName', 'region', 'environment', 'envBucketUrl'];
-  const backendFields = ['dockerFilePath', 'projectId', 'appProjectName', 'applicationName', 'region', 'environment', 'envBucketUrl', 'migrationScriptPath'];
+  // Define fields for frontend and backend separately, using conditions
+  const fieldsToDisplay = [
+    'projectId',
+    'appProjectName',
+    'applicationName',
+    'region',
+    'environment',
+    'dockerFilePath',
+    ...(configType === 'frontend' && usesEnvVars ? ['envBucketUrl'] : []), // Show dockerFilePath if using env vars for frontend
+    ...(configType === 'backend' && usesEnvVars ? ['envBucketUrl'] : []), // Show dockerFilePath if using env vars for backend
+    ...(configType === 'backend' && runsMigrations ? ['migrationScriptPath'] : []), // Show migrationScriptPath if running migrations for backend
+  ];
 
-  // Dynamically choose fields based on configType
-  const fieldsToDisplay = configType === 'frontend' ? frontendFields : backendFields;
+  // Sample values for tooltips
+  const sampleValues: { [key: string]: string } = {
+    envBucketUrl: 'Eg. envs_store_dev/parentyn/backend',
+    migrationScriptPath: 'Eg. ./migrate.sh',
+    projectId: 'Eg. codematic-shared-environment',
+    appProjectName: 'Eg. parentyn',
+    applicationName: 'Eg. frontend',
+    region: 'Eg. europe-west1',
+    dockerFilePath: 'Eg. ./codeblock-toolkit/Dockerfile',
+    environment: 'Eg. development',
+  };
 
   return (
     <div className="user-guide p-4 mb-6">
@@ -37,10 +60,19 @@ const DynamicValuesEditor: React.FC<DynamicValuesProps> = ({ values, setValues, 
               type="text"
               id={key}
               name={key}
-              value={values[key as keyof typeof values]} 
+              value={values[key as keyof typeof values]}
               onChange={handleChange}
-              className="p-2 border border-[#00000066] rounded-md"
+              onMouseEnter={() => setHoveredField(key)} // Track hovered field
+              onMouseLeave={() => setHoveredField(null)} // Reset on leave
+              className="p-2 border border-[#2563EB] rounded-lg relative"
+              data-tooltip={sampleValues[key] || 'No sample available'} // Use data attribute for custom tooltip
             />
+            {/* Custom tooltip */}
+            {hoveredField === key && (
+              <div className="custom-tooltip">
+                {sampleValues[key] || 'No sample available'}
+              </div>
+            )}
           </div>
         ))}
       </form>

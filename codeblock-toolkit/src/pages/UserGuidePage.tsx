@@ -1,5 +1,20 @@
-const UserGuidePage = () => {
+interface UserGuidePageProps {
+  onBack: () => void;
+  onSkipToConfigurator: () => void;
+}
+
+const UserGuidePage: React.FC<UserGuidePageProps> = ({ onBack, onSkipToConfigurator }) => {
   return (
+    <div className="p-6">
+      {/* "Skip to Configurator" button at the top */}
+      <div className="flex justify-end">
+        <button
+          onClick={onSkipToConfigurator}
+          className="px-8 py-3 bg-white text-[#2563EB] rounded-md hover:bg-[#2563EB1A] border-2 border-[#2563EB]"
+        >
+          Skip to Configurator
+        </button>
+      </div>
     <div className="user-guide p-4 mb-6 rounded-lg bg-[#FFFFFF]">
       <h2 className="text-lg font-bold mb-3">User Guide</h2>
       <p>
@@ -84,7 +99,7 @@ const UserGuidePage = () => {
         </li>
         <li className="relative pl-6">
           <span className="absolute left-0 top-0">›</span>
-          <strong>dockerFilePath</strong>: Replace with the path to your Dockerfile. If your Dockerfile is at the root of your application, delete the present content and leave this field blank.
+          <strong>dockerFilePath</strong>: Replace with the path to your Dockerfile. (e.g., <code>./codeblock-toolkit/Dockerfile</code>, <code>./Dockerfile</code>)
         </li>
         <li className="relative pl-6">
           <span className="absolute left-0 top-0">›</span>
@@ -95,6 +110,15 @@ const UserGuidePage = () => {
           <strong>environment</strong>: Replace with the environment type (e.g., <code>development</code>, <code>production</code>).
         </li>
       </ul>
+
+
+      <button
+        className="px-8 py-3 bg-[#2563EB] text-white rounded-md hover:bg-blue-700 border-2 border-[#2563EB] mb-10 mt-10"
+        onClick={onBack}
+      >
+        Proceed to Configurator
+      </button>
+    </div>
     </div>
   );
 };

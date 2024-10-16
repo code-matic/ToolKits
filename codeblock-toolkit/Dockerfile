@@ -2,7 +2,7 @@ FROM node:22-alpine
 
 WORKDIR /cloudbuild-generator
 
-COPY cloudbuild-generator/.env .
+COPY generator/.env .
 
 COPY ./codeblock-toolkit .
 
