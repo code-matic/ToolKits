@@ -159,7 +159,7 @@ function App() {
 
       {currentStep >= 0 && (
         <button
-          className="absolute top-16 left-6 md:left-8 lg:left-12 px-6 py-2 bg-[#2563EB] text-white rounded-md"
+          className="absolute top-16 left-6 md:left-8 lg:left-12 px-6 py-2 bg-white text-[#2563EB] rounded-md hover:bg-[#2563EB1A] border-2 border-[#2563EB]"
           onClick={handlePreviousStep}
         >
           Back
