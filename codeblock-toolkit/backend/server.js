@@ -48,8 +48,8 @@ app.get('/auth/github/callback', async (req, res) => {
   
       // Step 4: Upload cloudbuild.yaml to the repository
       const owner = 'AyBims'; // Replace with your GitHub username or organization
-      const repo = 'LearnWebhookTest'; // Replace with the actual GitHub repository name
-      const filePath = path.join(__dirname, 'cloudbuild.yaml'); // Only the file name
+      const repo = 'alx-backend-storage'; // Replace with the actual GitHub repository name
+      const filePath = 'cloudbuild.yaml'; // Only the file name
 
       // Fetch the current file information (to get the sha if it exists)
       let currentSha;
