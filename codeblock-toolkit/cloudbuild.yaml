@@ -19,6 +19,6 @@ steps:
   entrypoint: gcloud
   args: [
     'run', 'deploy',
-    'cloudbuild-generator-dev', '--image', 'eu.gcr.io/codematic-shared-environment/cloudbuild-generator-github:$SHORT_SHA',
+    'cloudbuild-generator-github', '--image', 'eu.gcr.io/codematic-shared-environment/cloudbuild-generator-github:$SHORT_SHA',
     '--region', 'europe-west1', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
   ]
