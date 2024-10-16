@@ -11,6 +11,7 @@ function App() {
   const [usesEnvVars, setUsesEnvVars] = useState<boolean>(false);
   const [runsMigrations, setRunsMigrations] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   const [values, setValues] = useState({
     applicationName: 'APPLICATION_NAME',
@@ -117,6 +118,48 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('accessToken');
+    if (token) {
+      setAccessToken(token);
+      console.log('Access token:', token); // You can store this in a secure way for further API calls.
+    }
+  }, []);
+
+  // Function to upload the cloudbuild.yaml file
+  const uploadCloudBuildFile = async () => {
+    if (!accessToken) return;
+
+    try {
+      const owner = 'AyBims'; // Change this to your GitHub username or org
+      const repo = 'LearnWebhookTest'; // Change this to your GitHub repository name
+
+      const response = await fetch(`http://localhost:3000/repos/${owner}/${repo}/contents/cloudbuild.yaml`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ accessToken }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('File uploaded successfully:', data);
+      } else {
+        console.error('Failed to upload file:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (accessToken) {
+      uploadCloudBuildFile(); // Trigger file upload once accessToken is available
+    }
+  }, [accessToken]);
+
   const renderConfigurator = () => {
     return (
       <>
@@ -141,6 +184,7 @@ function App() {
         </div>
 
         <button onClick={handleOAuthLogin}>Connect to GitHub</button>
+        {accessToken && <p>Authenticated! Access token: {accessToken}</p>}
 
         <ConfigPage
           values={values}
@@ -154,13 +198,29 @@ function App() {
   };
 
   const handleOAuthLogin = () => {
-    const clientId = 'YOUR_CLIENT_ID';
-    const redirectUri = 'YOUR_REDIRECT_URI'; // Same as the one in GitHub settings
-    const scope = 'repo'; // Scopes determine the level of access
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
-    
-    window.location.href = authUrl; // Redirect to GitHub
+    window.location.href = 'http://localhost:3000/auth/github';
   };
+
+  const fetchRepositories = async () => {
+    if (!accessToken) return;
+
+    try {
+      const response = await fetch('http://localhost:3000/repos', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const repos = await response.json();
+      console.log('Repositories:', repos);
+    } catch (error) {
+      console.error('Error fetching repositories:', error);
+    }
+  };
+
+  // Call the function to fetch repositories
+  useEffect(() => {
+    fetchRepositories();
+  }, [accessToken]);
 
   return (
     <section className="relative h-screen flex flex-col">

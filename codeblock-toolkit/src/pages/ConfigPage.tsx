@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Txt from '../components/DynamicText';
 import DynamicInput from '../components/DynamicInput';
 import { ToastContainer, toast } from 'react-toastify';
@@ -21,8 +21,11 @@ interface ConfigPageProps {
   appType: 'frontend' | 'backend'; // App type to distinguish between frontend and backend
 }
 
-const ConfigPage: React.FC<ConfigPageProps> = ({ values, setValues, usesEnvVars, runsMigrations, appType }) => {
+const ConfigPage: React.FC<ConfigPageProps> = ({ values, setValues, appType }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const [usesEnvVars, setUsesEnvVars] = useState<boolean | null>(null); // Track user choice for environment variables
+  const [runsMigrations, setRunsMigrations] = useState<boolean>(false);  // Track user choice for migrations
 
   const handleCopyAllClick = () => {
     if (containerRef.current) {
@@ -86,6 +89,25 @@ const ConfigPage: React.FC<ConfigPageProps> = ({ values, setValues, usesEnvVars,
               </svg>
             </button>
           </div>
+        </div>
+
+        {/* User Prompts */}
+        <div style={{ padding: '20px' }}>
+          <label>Are you using environment variables?</label>
+          <div>
+            <button onClick={() => setUsesEnvVars(true)}>Yes</button>
+            <button onClick={() => setUsesEnvVars(false)}>No</button>
+          </div>
+
+          {appType === 'backend' && (
+            <>
+              <label>Are you running any migrations?</label>
+              <div>
+                <button onClick={() => setRunsMigrations(true)}>Yes</button>
+                <button onClick={() => setRunsMigrations(false)}>No</button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Gray Box with Padding for Code Block */}
@@ -154,30 +176,12 @@ const ConfigPage: React.FC<ConfigPageProps> = ({ values, setValues, usesEnvVars,
                   :$SHORT_SHA',
                 </Txt>
                 <Txt tab={1}>
-                  '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>', '--command', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]}/>'</Txt>
+                  '--region', '<DynamicInput field="region" stateValues={[values, setValues]}/>',
+                  '--command', '<DynamicInput field="migrationScriptPath" stateValues={[values, setValues]} />',
+                </Txt>
                 <Txt tab={0.5}>]</Txt>
               </>
             )}
-
-            <Txt>- id: deploy-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
-            <Txt tab={0.5}>entrypoint: gcloud</Txt>
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'run', 'deploy',</Txt>
-            <Txt tab={1}>
-              '<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
-              -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
-              -<DynamicInput field="environment" stateValues={[values, setValues]} />', 
-              '--image', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
-              /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
-              -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
-              -<DynamicInput field="environment" stateValues={[values, setValues]} />
-              :$SHORT_SHA',
-            </Txt>
-            <Txt tab={1}>
-              '--region', '<DynamicInput field="region" stateValues={[values, setValues]} />', '--allow-unauthenticated', '--cpu=2', '--memory=2Gi', '--cpu-boost', '--timeout=500s'
-            </Txt>
-            <Txt tab={0.5}>]</Txt>
           </p>
         </div>
 
