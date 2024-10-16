@@ -1,166 +1,188 @@
-import { useState } from 'react';
-import { SiChatbot } from 'react-icons/si';
-import FrontendPage from "./pages/frontendPage";
-import BackendPage from "./pages/backendPage";
+import { useState, useEffect } from 'react';
+import ConfigPage from './pages/ConfigPage';
 import DynamicValuesEditor from './components/DynamicValuesEditor';
-import UserGuide from './pages/UserGuidePage';
 import FeedbackForm from './pages/FeedbackPage';
+import { SiChatbot } from 'react-icons/si';
+import UserGuidePage from './pages/UserGuidePage';
 
 function App() {
-  const [tabIndex, setTabIndex] = useState(0);
-  const [showUserGuide, setShowUserGuide] = useState(true);  // State to toggle User Guide visibility
-  const [showFeedback, setShowFeedback] = useState(false);   // State to toggle Feedback form visibility
+  const [currentStep, setCurrentStep] = useState(-1); // Start at -1 for User Guide
+  const [appType, setAppType] = useState<'frontend' | 'backend' | null>(null);
+  const [usesEnvVars, setUsesEnvVars] = useState<boolean>(false);
+  const [runsMigrations, setRunsMigrations] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
-  // State for dynamic values
-  const [frontendValues, setFrontendValues] = useState({
-    envBucketUrl: 'ENV_BUCKET_URL',
+  const [values, setValues] = useState({
     applicationName: 'APPLICATION_NAME',
     region: 'REGION',
     environment: 'ENVIRONMENT',
     appProjectName: 'APP_PROJECT_NAME',
     projectId: 'PROJECT_ID',
     dockerFilePath: 'DOCKER_FILE_PATH',
+    envBucketUrl: '',
+    migrationScriptPath: '',
   });
 
-  const [backendValues, setBackendValues] = useState({
-    applicationName: 'APPLICATION_NAME',
-    region: 'REGION',
-    environment: 'ENVIRONMENT',
-    appProjectName: 'APP_PROJECT_NAME',
-    projectId: 'PROJECT_ID',
-    envBucketUrl: 'ENV_BUCKET_URL',
-    dockerFilePath: 'DOCKER_FILE_PATH',
-    migrationScriptPath: 'MIGRATION_SCRIPT_PATH',
-  });
+  useEffect(() => {
+    setValues(prevValues => ({
+      ...prevValues,
+      envBucketUrl: usesEnvVars ? 'ENV_BUCKET_URL' : '',
+      migrationScriptPath: appType === 'backend' && runsMigrations ? 'MIGRATION_SCRIPT_PATH' : '',
+    }));
+  }, [appType, usesEnvVars, runsMigrations]);
 
-  const handleDropdown = (index: number) => {
-    setTabIndex(index);
+  const handleNextStep = () => {
+    setCurrentStep(currentStep + 1);
   };
 
-  const tabs = [{
-    name: "Frontend Configuration",
-    component: (
-      <FrontendPage 
-        values={frontendValues} 
-        setValues={setFrontendValues} // Pass setValues prop to update frontend values
-      />
-    )
-  }, {
-    name: "Backend Configuration",
-    component: (
-      <BackendPage 
-        values={backendValues} 
-        setValues={setBackendValues} // Pass setValues prop to update backend values
-      />
-    )
-  }];
+  const handlePreviousStep = () => {
+    setCurrentStep(currentStep - 1);
+  };
+
+  const skipToConfigurator = () => {
+    setCurrentStep(0); // Go directly to the first question
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case -1:
+        return (
+          <UserGuidePage
+            onBack={skipToConfigurator} // "Back to Configurator" button
+            onSkipToConfigurator={skipToConfigurator} // "Skip to Configurator" button
+          />
+        );
+      case 0:
+        return (
+          <div className="flex flex-col items-center justify-center">
+            <h2 className="text-xl mb-6">Are you running a frontend or a backend app?</h2>
+            <div className="space-x-4">
+              <button
+                className="px-6 py-3 bg-[#2563EB] text-white rounded-md"
+                onClick={() => { setAppType('frontend'); handleNextStep(); }}
+              >
+                Frontend
+              </button>
+              <button
+                className="px-6 py-3 bg-[#2563EB] text-white rounded-md"
+                onClick={() => { setAppType('backend'); handleNextStep(); }}
+              >
+                Backend
+              </button>
+            </div>
+          </div>
+        );
+      case 1:
+        return (
+          <div className="flex flex-col items-center justify-center">
+            <h2 className="text-xl mb-6">Are you using environment variables?</h2>
+            <div className="space-x-4">
+              <button
+                className="px-6 py-3 bg-[#2563EB] text-white rounded-md"
+                onClick={() => { setUsesEnvVars(true); handleNextStep(); }}
+              >
+                Yes
+              </button>
+              <button
+                className="px-6 py-3 bg-[#2563EB] text-white rounded-md"
+                onClick={() => { setUsesEnvVars(false); handleNextStep(); }}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        );
+      case 2:
+        return appType === 'backend' ? (
+          <div className="flex flex-col items-center justify-center">
+            <h2 className="text-xl mb-6">Are you using a migration step?</h2>
+            <div className="space-x-4">
+              <button
+                className="px-6 py-3 bg-[#2563EB] text-white rounded-md"
+                onClick={() => { setRunsMigrations(true); handleNextStep(); }}
+              >
+                Yes
+              </button>
+              <button
+                className="px-6 py-3 bg-[#2563EB] text-white rounded-md"
+                onClick={() => { setRunsMigrations(false); handleNextStep(); }}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        ) : renderConfigurator();
+      default:
+        return renderConfigurator();
+    }
+  };
+
+  const renderConfigurator = () => {
+    return (
+      <>
+        <DynamicValuesEditor
+          values={values}
+          setValues={setValues}
+          configType={appType || 'frontend'}
+          usesEnvVars={usesEnvVars}
+          runsMigrations={runsMigrations}
+        />
+
+        <div className="text-center mt-6">
+          <p className="text-lg">
+            Want to learn more about the different dynamic values and how to derive them?
+            <button
+              onClick={() => setCurrentStep(-1)}
+              className="text-blue-500 underline ml-2"
+            >
+              Click here
+            </button>
+          </p>
+        </div>
+
+        <ConfigPage
+          values={values}
+          setValues={setValues}
+          usesEnvVars={usesEnvVars}
+          runsMigrations={runsMigrations}
+          appType={appType || 'frontend'}
+        />
+      </>
+    );
+  };
 
   return (
-    <section className="relative"> {/* Added 'relative' to position the feedback button */}
-      {/* Show the User Guide first */}
+    <section className="relative h-screen flex flex-col">
       <header className="text-center bg-white py-4">
         <h1 className="text-5xl font-bold text-[#2563EB]">CLOUDBUILD GENERATOR</h1>
       </header>
 
-      {showUserGuide ? (
-        <div className="max-w-screen-lg mx-auto mt-5 h-full rounded-lg p-4">
-          <div className="flex justify-end mt-5">
-            <button
-              className="px-8 py-3 bg-white text-[#2563EB] rounded-md hover:bg-[#2563EB1A] border-2 border-[#2563EB]"
-              onClick={() => setShowUserGuide(false)}  // Hide User Guide and show the rest of the app
-            >
-              Skip to Configurator
-            </button>
-          </div>
-          
-          <UserGuide />
-          
-          <div className="mt-5">
-            <button
-              className="px-8 py-3 bg-[#2563EB] text-white rounded-md hover:bg-blue-700 border-2 border-[#2563EB] mb-10"
-              onClick={() => setShowUserGuide(false)}  // Hide User Guide and show the rest of the app
-            >
-              Proceed to Configurator
-            </button>
-          </div>
+      {currentStep >= 0 && (
+        <button
+          className="absolute top-16 left-6 md:left-8 lg:left-12 px-6 py-2 bg-white text-[#2563EB] rounded-md hover:bg-[#2563EB1A] border-2 border-[#2563EB]"
+          onClick={handlePreviousStep}
+        >
+          Back
+        </button>
+      )}
 
-          {/* Provide Feedback Button at the bottom */}
-          <button
-            className="fixed bottom-8 right-5 px-6 py-3 bg-[#2563EB] text-white rounded-full hover:bg-[#1D4ED8] flex items-center space-x-2"
-            onClick={() => setShowFeedback(!showFeedback)}  // Toggle feedback form
-          >
-            <span>
-              <SiChatbot className="text-white text-xl" /> {/* Feedback Icon */}
-            </span>
-            <span>{showFeedback ? "Close Feedback" : "Provide Feedback"}</span>
-          </button>
-
-          {/* Conditionally display the Feedback Form */}
-          {showFeedback && (
-            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 w-[90%] max-w-md">
-              <FeedbackForm onClose={() => setShowFeedback(false)} /> {/* Pass onClose prop */}
-            </div>
-          )}
+      <div className="flex flex-grow items-center justify-center">
+        <div className="max-w-screen-lg w-full p-4">
+          {renderStep()}
         </div>
-      
-      ) : (
-        <>
-          <div className="max-w-screen-lg mx-auto mt-5 h-full rounded-lg p-4">
-            <button
-              className="px-8 py-3 bg-white text-[#2563EB] rounded-md hover:bg-[#2563EB1A] border-2 border-[#2563EB]"
-              onClick={() => setShowUserGuide(true)}  // Show User Guide again
-            >
-              Go Back to User Guide
-            </button>
+      </div>
 
-            {/* Tabs for frontend and backend configuration */}
-            <div className="mt-5">
-              <div className="flex justify-between border-b border-gray-500">
-                {tabs.map((item, index) => (
-                  <button
-                    key={index}
-                    className={`${tabIndex === index 
-                      ? "text-blue-500 border-blue-500 border-b-2 bg-[#2563EB1A]"  // Active tab gets background color
-                      : "text-gray-500"
-                    } p-2 px-4 font-medium flex-grow text-center`}  // flex-grow ensures equal width, text-center aligns the text
-                    onClick={() => handleDropdown(index)}
-                  >
-                    {item.name}
-                  </button>
-                ))}
-              </div>
-            </div>
+      <button
+        onClick={() => setShowFeedbackForm(true)}
+        className="fixed bottom-8 right-5 px-6 py-3 bg-[#2563EB] text-white rounded-full hover:bg-[#1D4ED8] flex items-center space-x-2"
+      >
+        <SiChatbot className="text-white text-4xl" />
+      </button>
 
-            {/* Dynamic Values Editor */}
-            <div className="mt-5">
-              <DynamicValuesEditor
-                values={tabIndex === 0 ? frontendValues : backendValues} // Display appropriate values
-                setValues={tabIndex === 0 ? setFrontendValues : setBackendValues} // Set appropriate values
-                configType={tabIndex === 0 ? 'frontend' : 'backend'} // Pass correct config type
-              />
-            </div>
-
-            {/* Render the content from either FrontendPage or BackendPage */}
-            <div className="mt-5">
-              {tabs[tabIndex].component}
-            </div>
-
-            {/* Provide Feedback Button at the bottom */}
-            <button
-              className="fixed bottom-8 right-5 px-6 py-3 bg-[#2563EB] text-white rounded-full hover:bg-[#1D4ED8] flex items-center space-x-2"
-              onClick={() => setShowFeedback(!showFeedback)}  // Toggle feedback form
-            >
-              <SiChatbot className="text-white text-4xl" /> {/* Feedback Icon */}
-            </button>
-
-            {/* Conditionally display the Feedback Form */}
-            {showFeedback && (
-              <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 w-[90%] max-w-md">
-                <FeedbackForm onClose={() => setShowFeedback(false)} /> {/* Pass onClose prop */}
-              </div>
-            )}
-          </div>
-        </>
+      {showFeedbackForm && (
+        <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 w-[90%] max-w-md">
+          <FeedbackForm onClose={() => setShowFeedbackForm(false)} />
+        </div>
       )}
     </section>
   );

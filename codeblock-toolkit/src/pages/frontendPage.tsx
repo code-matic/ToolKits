@@ -6,26 +6,26 @@ import 'react-toastify/dist/ReactToastify.css';
 
 interface FrontendPageProps {
   values: {
-    envBucketUrl: string;
     applicationName: string;
     region: string;
     environment: string;
     appProjectName: string;
     projectId: string;
-    dockerFilePath: string;
+    envBucketUrl: string;
   };
   setValues: React.Dispatch<React.SetStateAction<{
-    envBucketUrl: string;
     applicationName: string;
     region: string;
     environment: string;
     appProjectName: string;
     projectId: string;
-    dockerFilePath: string;
+    envBucketUrl: string;
   }>>;
+  usesEnvVars: boolean | null; // Prop for environment variable usage
+  // setUsesEnvVars: React.Dispatch<React.SetStateAction<boolean | null>>; // Setter for environment variable usage
 }
 
-const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
+const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues, usesEnvVars}) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleCopyAllClick = () => {
@@ -44,37 +44,29 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
 
       // Copy the text to clipboard
       navigator.clipboard.writeText(textToCopy.replace(/\u00A0/g, ' ')).then(() => {
-        toast.success("Copied to clipboard");
+        toast.success('Copied to clipboard');
       });
     }
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        padding: '20px',
-      }}
-    >
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
       <div
         style={{
           backgroundColor: '#f0f3f4',
-          padding: '0', // Remove padding around the banner section
+          padding: '0',
           borderRadius: '5px',
           position: 'relative',
           width: '100%',
           overflowX: 'auto',
         }}
       >
-
-        {/* Your Output Banner and Copy Button */}
-        <div className="w-full flex justify-between items-center bg-[#2563EB] text-white p-4 mb-4" 
-          style={{ margin: '0', padding: '0 70px', height: '71px' }} // Added more padding for left and right
+        {/* Output Banner and Copy Button */}
+        <div
+          className="w-full flex justify-between items-center bg-[#2563EB] text-white p-4 mb-4"
+          style={{ margin: '0', padding: '0 70px', height: '71px' }}
         >
-          <h2 className="font-semibold">Your Output</h2> {/* Increased font size */}
-          
-          {/* Copy Text and Copy Button */}
+          <h2 className="font-semibold">Your Output</h2>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <span className="font-semibold" style={{ marginRight: '10px' }}>Copy Text</span>
             <button
@@ -83,7 +75,7 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="32" // Increased button size
+                width="32"
                 height="32"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -101,34 +93,37 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
         </div>
 
         {/* Gray Box with Padding for Code Block */}
-        <div ref={containerRef} style={{ padding: '20px' }}>  {/* Retain padding for the actual code block */}
+        <div ref={containerRef} style={{ padding: '20px' }}>
           <p className="mb-4">
             <Txt>steps: </Txt>
-            <Txt>- id: pull-env</Txt>
-            <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt> 
-            <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'cp', 'gs://
-            <DynamicInput field="envBucketUrl" stateValues={[values, setValues]} />
-            /.env', './<DynamicInput field="applicationName" stateValues={[values, setValues]} />/.env']</Txt>
-
+            {usesEnvVars && (
+              <>
+                <Txt>- id: pull-env</Txt>
+                <Txt tab={0.5}>name: 'gcr.io/cloud-builders/gsutil'</Txt>
+                <Txt tab={0.5}>args: [</Txt>
+                <Txt tab={1}>
+                  'cp', 'gs://<DynamicInput field="envBucketUrl" stateValues={[values, setValues]} />/.env', './<DynamicInput field="applicationName" stateValues={[values, setValues]} />/.env'
+                </Txt>
+                <Txt tab={0.5}>]</Txt>
+              </>
+            )}
             <Txt>- id: build-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt>
             <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
+            <Txt tab={1}>
+              'build', '-t', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
               /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
               -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
               -<DynamicInput field="environment" stateValues={[values, setValues]} />
-              :$SHORT_SHA', '-f', './<DynamicInput field="dockerFilePath" stateValues={[values, setValues]} />
-              Dockerfile', './'
+              :$SHORT_SHA', '-f', '<DynamicInput field="dockerFilePath" stateValues={[values, setValues]} />', './'
             </Txt>
             <Txt tab={0.5}>]</Txt>
 
             <Txt>- id: push-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt> 
+            <Txt tab={0.5}>name: "gcr.io/cloud-builders/docker"</Txt>
             <Txt tab={0.5}>args: [</Txt>
-            <Txt tab={1}>'push',</Txt>
             <Txt tab={1}>
-              'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
+              'push', 'eu.gcr.io/<DynamicInput field="projectId" stateValues={[values, setValues]} />
               /<DynamicInput field="appProjectName" stateValues={[values, setValues]} />
               -<DynamicInput field="applicationName" stateValues={[values, setValues]} />
               -<DynamicInput field="environment" stateValues={[values, setValues]} />
@@ -137,7 +132,7 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
             <Txt tab={0.5}>]</Txt>
 
             <Txt>- id: deploy-image</Txt>
-            <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt> 
+            <Txt tab={0.5}>name: "gcr.io/google.com/cloudsdktool/cloud-sdk"</Txt>
             <Txt tab={0.5}>entrypoint: gcloud</Txt>
             <Txt tab={0.5}>args: [</Txt>
             <Txt tab={1}>'run', 'deploy',</Txt>
@@ -158,18 +153,7 @@ const FrontendPage: React.FC<FrontendPageProps> = ({ values, setValues }) => {
           </p>
         </div>
 
-        <ToastContainer
-          position="bottom-left"
-          autoClose={2500}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable={false}
-          pauseOnHover={false}
-          theme="dark"
-        />
+        <ToastContainer />
       </div>
     </div>
   );
