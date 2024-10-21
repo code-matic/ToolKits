@@ -8,7 +8,11 @@ import (
 )
 
 type Config struct {
-	PORT string `mapstructure:"PORT"`
+	PORT             string `mapstructure:"PORT"`
+	GH_CLIENT_ID     string `mapstructure:"GH_CLIENT_ID"`
+	GH_CLIENT_SECRET string `mapstructure:"GH_CLIENT_SECRET"`
+	GH_REDIRECT_URL  string `mapstructure:"GH_REDIRECT_URL"`
+	ENVIRONMENT      string `mapstructure:"ENVIRONMENT"`
 }
 
 var Env *Config = &Config{}
