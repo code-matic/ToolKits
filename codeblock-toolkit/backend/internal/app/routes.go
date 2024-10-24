@@ -15,6 +15,8 @@ func configureRoutes() {
 		gh := v1.Group("github")
 		{
 			gh.GET("/login", ghApi.GithubLogin)
+			gh.GET("/callback", ghApi.GithubCallback)
+			gh.GET("/repos", ghApi.FetchRepos)
 		}
 	}
 }
